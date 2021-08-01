@@ -1,31 +1,30 @@
-import Highcharts from 'highcharts'
-import PieChart from "highcharts-react-official";
-import { Row, Col, Card, List, Space, Avatar } from 'antd';
+import { Row, Card, List, Avatar } from 'antd';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { keySecret } from '../recoils/atoms/keySecret'
-// import axios from 'axios';
+import { useLazyQuery, useQuery } from '@apollo/client'
+import { QUERY_BALANCE } from '../documents'
 
-export default function Home() {
+const Home = () => {
 
   const credentials = useRecoilValue(keySecret);
   const [balances, setBalances] = useState([])
 
-  // const fetchAPI = async () => {
-  //   const options = {
-  //     headers: {'Content-Type': 'application/json'}
-  //   };
-  //   const payload = { key: credentials.btKey, secret: credentials.btSecret };
-  //   const res:any = await axios.post(`/api/hello`, payload, options)
-  //   const { data } = res;
-  //   if(data?.success){
-  //     setBalances(data?.balances);
-  //   }
-  // }
+  const { data, loading, error } = useQuery(QUERY_BALANCE, {
+    variables:{
+      key: credentials.btKey,
+      secret: credentials.btSecret
+    },
+    fetchPolicy: "network-only",
+  })
 
-  // useEffect(() => {
-  //   fetchAPI()
-  // },[])
+  useEffect(() => {
+    const mData: any = data?.getBalance
+    if(mData && mData.success){
+      setBalances(mData.balances)
+    }
+    if (error) console.log(`Err: ${error}`)
+  }, [loading, error, data])
   
   return (
     <Row gutter={16}>
@@ -33,7 +32,7 @@ export default function Home() {
         <List
             dataSource={balances}
             renderItem={(item:any) => (
-              <List.Item key={'item.id'}>
+              <List.Item key={`${item.symbol}_${item.available}`}>
                 <List.Item.Meta
                   avatar={
                     <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
@@ -75,3 +74,5 @@ export default function Home() {
     </Row>
   )
 }
+
+export default Home;

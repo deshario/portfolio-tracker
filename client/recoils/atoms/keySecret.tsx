@@ -2,7 +2,7 @@ import { atom } from "recoil"
 import { recoilPersist } from 'recoil-persist'
 import { encrypt, decrypt }  from '../../utils'
 
-const localStorageBase64 = () => {
+const mStorage = () => {
   return {
     setItem: (key:any, value:any) => {
       const credentials = JSON.parse(value);
@@ -26,7 +26,7 @@ const localStorageBase64 = () => {
   }
 }
 
-const { persistAtom } = recoilPersist({ key: 'ptCredentials', storage: localStorageBase64() })
+const { persistAtom } = recoilPersist({ key: 'ptCredentials', storage: mStorage() })
 
 export const keySecret = atom({
   key: "keySecret",
@@ -36,12 +36,3 @@ export const keySecret = atom({
   },
   effects_UNSTABLE: [persistAtom],
 })
-
-// export const fontSizeLabelState = selector({
-//   key: 'fontSizeLabelState',
-//   get: ({get}) => {
-//     const fontSize = get(keySecret);
-//     const unit = 'px';
-//     return `${fontSize}${unit}`;
-//   },
-// });
