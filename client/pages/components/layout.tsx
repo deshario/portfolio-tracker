@@ -18,13 +18,13 @@ const TrackerLayout = (props:any) => {
       <Sider theme="light">
         <div style={{ height: '32px', background: '#616161', margin: '16px' }} />
         <Menu theme="light" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item key="assets" icon={<WalletOutlined />} disabled={noConnection}>
+          <Menu.Item key="assets" icon={<WalletOutlined />}>
             <Link href="/">Assets</Link>
           </Menu.Item>
-          <Menu.Item key="deposits" icon={<CloudUploadOutlined />} disabled={noConnection}>
+          <Menu.Item key="deposits" icon={<CloudUploadOutlined />}>
             <Link href="/deposits">Deposits</Link>
           </Menu.Item>
-          <Menu.Item key="withdrawls" icon={<CloudDownloadOutlined />} disabled={noConnection}>
+          <Menu.Item key="withdrawls" icon={<CloudDownloadOutlined />}>
             <Link href="/withdrawls">WithDrawls</Link>
           </Menu.Item>
           <Menu.Item key="connection" icon={<ApiOutlined />}>

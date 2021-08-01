@@ -45,8 +45,8 @@ const Connection = () => {
             <Input />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="button" onClick={manualSubmit} disabled={!emptyConnection}>Connect</Button>&nbsp;&nbsp;
-            <Button type="primary" htmlType="button" onClick={resetForm} disabled={emptyConnection} danger>Terminate</Button>
+            <Button type="primary" htmlType="button" onClick={manualSubmit}>Connect</Button>&nbsp;&nbsp;
+            <Button type="primary" htmlType="button" onClick={resetForm} danger>Terminate</Button>
           </Form.Item>
         </Form>
       </Card>
