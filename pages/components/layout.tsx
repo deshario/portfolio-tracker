@@ -1,23 +1,30 @@
+import React from 'react'
+import Link from 'next/link'
 import { Layout, Menu } from 'antd';
 import { CloudDownloadOutlined, WalletOutlined, CloudUploadOutlined, ApiOutlined } from '@ant-design/icons';
-import Link from 'next/link'
-import React from 'react'
+import { useRecoilValue } from 'recoil';
+import { keySecret } from '../../recoils/atoms/keySecret'
 
 const { Header, Content, Sider } = Layout;
 
 const TrackerLayout = (props:any) => {
+
+  const credentials = useRecoilValue(keySecret);
+
+  const noConnection = Object.values(credentials).every(x => x == '');
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider theme="light">
         <div style={{ height: '32px', background: '#616161', margin: '16px' }} />
         <Menu theme="light" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item key="assets" icon={<WalletOutlined />}>
+          <Menu.Item key="assets" icon={<WalletOutlined />} disabled={noConnection}>
             <Link href="/">Assets</Link>
           </Menu.Item>
-          <Menu.Item key="deposits" icon={<CloudUploadOutlined />}>
+          <Menu.Item key="deposits" icon={<CloudUploadOutlined />} disabled={noConnection}>
             <Link href="/deposits">Deposits</Link>
           </Menu.Item>
-          <Menu.Item key="withdrawls" icon={<CloudDownloadOutlined />}>
+          <Menu.Item key="withdrawls" icon={<CloudDownloadOutlined />} disabled={noConnection}>
             <Link href="/withdrawls">WithDrawls</Link>
           </Menu.Item>
           <Menu.Item key="connection" icon={<ApiOutlined />}>

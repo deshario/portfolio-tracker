@@ -32,7 +32,7 @@ const Connection = () => {
     }
   }
 
-  const isConnected = Object.values(credentials).every(x => x == '');
+  const emptyConnection = Object.values(credentials).every(x => x == '');
 
   return (
     <div>
@@ -45,8 +45,8 @@ const Connection = () => {
             <Input />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="button" onClick={manualSubmit} disabled={!isConnected}>Connect</Button>&nbsp;&nbsp;
-            <Button type="primary" htmlType="button" onClick={resetForm} disabled={isConnected} danger>Terminate</Button>
+            <Button type="primary" htmlType="button" onClick={manualSubmit} disabled={!emptyConnection}>Connect</Button>&nbsp;&nbsp;
+            <Button type="primary" htmlType="button" onClick={resetForm} disabled={emptyConnection} danger>Terminate</Button>
           </Form.Item>
         </Form>
       </Card>
