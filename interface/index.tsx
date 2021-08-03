@@ -10,14 +10,22 @@ export interface TotalBalance {
 }
 
 export interface FDeposit {
-	currency: String
+	currency: string
 	amount: number
-	status: String
-	time: String
-	date: String
+	status: string
+	time: string
+	date: string
 }
 
 export interface FiatDeposit {
 	success: Boolean
 	data: [FDeposit]
+}
+
+export interface Ticker {
+	symbol: string
+	last: number
+	lowestAsk: number
+	highestBid: number
+	percentChange: string
 }
