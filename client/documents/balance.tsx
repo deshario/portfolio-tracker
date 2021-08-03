@@ -7,6 +7,7 @@ export const BALANCE_FRAG = gql`
       symbol
       available
       reserved
+      value
     }
   }
 `

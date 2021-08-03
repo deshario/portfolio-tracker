@@ -2,7 +2,7 @@ import { Row, Card, List, Avatar } from 'antd';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { keySecret } from '../recoils/atoms/keySecret'
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { QUERY_BALANCE } from '../documents'
 
 const Home = () => {
@@ -21,6 +21,13 @@ const Home = () => {
   useEffect(() => {
     const mData: any = data?.getBalance
     if(mData && mData.success){
+      // const netWorth = mData.balances.reduce((totalPrice:any, eachItem:any) => {
+      //   const available = Number(eachItem.available);
+      //   const value = Number(eachItem.value);
+      //   totalPrice = totalPrice+(available*value)
+      //   return totalPrice;
+      // },0)
+      // console.log('Net Worth : ',netWorth);
       setBalances(mData.balances)
     }
     if (error) console.log(`Err: ${error}`)
@@ -40,7 +47,10 @@ const Home = () => {
                   title={<a>{item.symbol}</a>}
                   description={item.available}
                 />
-                <div>40%</div>
+                <div style={{ textAlign: 'right' }}>
+                  <span>40%</span><br/>
+                  <span style={{ color:'green' }}>฿{Number(item.available * item.value).toFixed(2)}</span>
+                </div>
               </List.Item>
             )}>
         </List>
