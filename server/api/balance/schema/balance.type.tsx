@@ -5,7 +5,8 @@ const balanceType = gql`
 	type Balance {
 		available: String
 		reserved: String
-		symbol: String 
+		symbol: String
+		value: String
 	}
 
   type TotalBalance {

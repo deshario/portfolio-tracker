@@ -1,7 +1,8 @@
 export interface Balance {
-	available: String
-	reserved: String
-	symbol: String 
+	available: string
+	reserved: string
+	symbol: string
+	value: string
 }
 
 export interface TotalBalance {
