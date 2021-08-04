@@ -21,14 +21,27 @@ const Home = () => {
   useEffect(() => {
     const mData: any = data?.getBalance
     if(mData && mData.success){
-      // const netWorth = mData.balances.reduce((totalPrice:any, eachItem:any) => {
-      //   const available = Number(eachItem.available);
-      //   const value = Number(eachItem.value);
-      //   totalPrice = totalPrice+(available*value)
-      //   return totalPrice;
-      // },0)
-      // console.log('Net Worth : ',netWorth);
-      setBalances(mData.balances)
+
+      const netWorth = mData.balances.reduce((totalPrice:any, eachItem:any) => {
+        const available = Number(eachItem.available);
+        const value = Number(eachItem.value);
+        totalPrice = totalPrice+(available*value)
+        return totalPrice;
+      },0);
+
+      const totalBalances = mData.balances.map((eachItem:any) => {
+        const available = Number(eachItem.available);
+        const value = Number(eachItem.value);
+        const totalValue = available*value;
+        const percent = (totalValue / Number(netWorth)) * 100;
+        return {
+          ...eachItem,
+          realValue: Number(totalValue).toFixed(2),
+          percent:Number(percent).toFixed(2)
+        }
+      });
+
+      setBalances(totalBalances)
     }
     if (error) console.log(`Err: ${error}`)
   }, [loading, error, data])
@@ -48,39 +61,14 @@ const Home = () => {
                   description={item.available}
                 />
                 <div style={{ textAlign: 'right' }}>
-                  <span>40%</span><br/>
-                  <span style={{ color:'green' }}>฿{Number(item.available * item.value).toFixed(2)}</span>
+                  <span>{item.percent}%</span><br/>
+                  <span style={{ color:'green' }}>฿{item.realValue}</span>
                 </div>
               </List.Item>
             )}>
         </List>
       </Card>
-
-      {/* <Space size={[8, 16]} wrap>
-      {
-        balances.map((e:any) => {
-          return (
-            
-            <Card key={`${e.symbol}_${e.available}`} hoverable style={{ width: 250 }}  actions={[
-              <>
-              <span className={`ant-card-meta-title`}>50%</span>
-              </>
-            ]}>
-              <Row>
-                <Col flex={4}>
-                  <span className={`ant-card-meta-title`}>{e.symbol}</span>
-                </Col>
-                <Col flex={1}>
-                  <span style={{ color:'rgba(0, 0, 0, 0.45)' }}>{e.available}</span>
-                </Col>
-              </Row>
-              
-            </Card>
-          )
-        })
-      }
-      </Space>
-    */}
+   
     </Row>
   )
 }
