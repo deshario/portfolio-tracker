@@ -1,4 +1,4 @@
-import { Row, Card, List, Tag, Col, Timeline } from 'antd';
+import { Row, Card, Tag, Col, Timeline, Space } from 'antd';
 import { QUERY_FIAT_DEPOSIT } from '../documents'
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
@@ -44,39 +44,51 @@ const Deposits = () => {
 
   const styles = {
     card: {
-      width: 380,
+      // width: 380,
       maxHeight: '100%'
     },
     cardBody: {
-      maxHeight: 500,
+      maxHeight: 530,
       overflow: 'auto',
       paddingBottom: 'unset'
+    },
+    cryptoBox:{
+      marginLeft:'1px'
     }
   };
 
   return (
     <div>
-      <Card hoverable title="Fiat Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}>
-        <Timeline mode={`left`}>
-          {
-            deposits.map((item:any, index:number) => {
-              return (
-                <Timeline.Item
-                  key={index}
-                  dot={<ItemDot status={item.status}/>}
-                  color={itemColor(item.status)}>
-                    <span style={{ color:itemColor(item.status) }}>
-                      {THB(item.amount)} at {item.date}
-                      <Tag color={itemColor(item.status)} style={{ marginLeft:'10px', float:'right'}}>
-                        {item.status}
-                      </Tag>
-                    </span>
-                </Timeline.Item>
-              )
-            })
-          }
-        </Timeline>
-      </Card>
+      <Row gutter={[8, 16]}>
+        <Col span={9}>
+          <Card hoverable title="Fiat Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}>
+            <Timeline>
+              {
+                deposits.map((item:any, index:number) => {
+                  return (
+                    <Timeline.Item
+                      key={index}
+                      dot={<ItemDot status={item.status}/>}
+                      color={itemColor(item.status)}>
+                        <span style={{ color:itemColor(item.status) }}>
+                          {THB(item.amount)} at {item.date}
+                          <Tag color={itemColor(item.status)} style={{ marginLeft:'10px', float:'right'}}>
+                            {item.status}
+                          </Tag>
+                        </span>
+                    </Timeline.Item>
+                  )
+                })
+              }
+            </Timeline>
+          </Card>
+        </Col>
+        <Col span={15}>
+          <Card hoverable title="Crypto Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}>
+          </Card>
+        </Col>
+      </Row>
+      
     </div>
   )
 }
