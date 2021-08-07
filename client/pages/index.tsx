@@ -13,6 +13,7 @@ const Home = () => {
   const [balances, setBalances] = useState({
     listData: [],
     pieData: [],
+    totalValue: '',
   })
 
   const { data, loading, error } = useQuery(QUERY_BALANCE, {
@@ -22,6 +23,11 @@ const Home = () => {
     },
     fetchPolicy: "network-only",
   })
+
+  const THB = (amount:number|string) => {
+    let amountNum =  typeof amount == 'string' ? Number(amount) : amount
+    return new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(amountNum)
+  }
 
   useEffect(() => {
     const mData: any = data?.getBalance
@@ -59,6 +65,7 @@ const Home = () => {
       setBalances({
         listData: totalBalances,
         pieData: chartData,
+        totalValue: Number(netWorth).toFixed(2)
       })
       
     }
@@ -71,6 +78,7 @@ const Home = () => {
         <Card hoverable style={{ width: 400 }}>
           <List
             dataSource={balances.listData}
+            header={<div>Total Value : {THB(balances.totalValue)}</div>}
             renderItem={(item:any) => (
               <List.Item key={`${item.symbol}_${item.available}`}>
                 <List.Item.Meta
@@ -82,7 +90,7 @@ const Home = () => {
                 />
                 <div style={{ textAlign: 'right' }}>
                   <span>{item.percent}%</span><br/>
-                  <span style={{ color:'green' }}>฿{item.realValue}</span>
+                  <span style={{ color:'green' }}>{THB(item.realValue)}</span>
                 </div>
               </List.Item>
             )}>

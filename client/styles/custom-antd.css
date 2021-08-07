@@ -39,7 +39,23 @@ section.content-light{
   margin-left: 200px !important;
 }
 
+.ant-list-item{
+  transition: transform .2s;
+}
 
+.ant-list-item:hover {
+  transform: scale(1.05);
+}
+
+.ant-list-header{
+  padding-top:unset;
+}
+
+.ant-list-header div {
+  text-align: center;
+  font-weight:bold;
+  font-size:18px;
+}
 
 
 /* .ant-layout-content{
