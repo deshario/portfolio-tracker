@@ -72,10 +72,19 @@ const Home = () => {
     if (error) console.log(`Err: ${error}`)
   }, [loading, error, data])
 
+  const styles = {
+    card: {
+      width: 400,
+    },
+    cardBody: {
+      paddingBottom: 'unset'
+    }
+  };
+
   return (
     <Row gutter={16}>
       <Col>
-        <Card hoverable style={{ width: 400 }}>
+        <Card hoverable style={styles.card} bodyStyle={styles.cardBody}>
           <List
             dataSource={balances.listData}
             header={<div>Total Value : {THB(balances.totalValue)}</div>}
@@ -95,7 +104,7 @@ const Home = () => {
               </List.Item>
             )}>
           </List>
-      </Card>
+        </Card>
       </Col>
       <Col>
         <PieChart

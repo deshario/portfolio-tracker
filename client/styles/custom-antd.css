@@ -57,6 +57,18 @@ section.content-light{
   font-size:18px;
 }
 
+.ant-timeline-item-content{
+  transition: transform .2s;
+}
+
+.ant-timeline-item-content:hover{
+  transform: scale(1.05);
+}
+
+.ant-timeline-item-last{
+  padding-bottom: unset;
+}
+
 
 /* .ant-layout-content{
   background:green !important;
