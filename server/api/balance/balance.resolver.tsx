@@ -3,8 +3,8 @@ import { TotalBalance } from '../../../interface'
 
 const balanceResolver = {
 	Query: {
-		getBalance(root: any, args: any, context: any): Promise<TotalBalance | any> {
-			return balanceController.getBalance(args,context);
+		getBalance(parent: any, args: any, context: any): Promise<TotalBalance | any> {
+			return balanceController.getBalance(args);
 		},
 	},
 }
