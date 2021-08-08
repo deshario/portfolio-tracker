@@ -24,3 +24,11 @@ export const createHeader = (key:string) => {
     }
   }
 }
+
+export const getReqConstructor = async ({ key, secret, payload }) => {
+  const bPayload = await createPayload(payload)
+  const signatureHash = createSignature(bPayload,secret);
+  const data = { sig:signatureHash, ...bPayload }
+  const headers = createHeader(key);
+  return { data, headers }
+}

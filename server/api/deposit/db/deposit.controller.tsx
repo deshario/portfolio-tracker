@@ -1,31 +1,50 @@
-import { API_HOST, createPayload, createSignature, createHeader } from '../../../config/handler'
-import { FDeposit, FiatDeposit } from '../../../../interface'
+import { API_HOST, getReqConstructor } from '../../../config/handler'
 import axios from 'axios';
-import moment from 'moment';
 
 const depositController = {
-  getFiatDeposit: async(args:any, context:any) => {
+
+  getFiatDeposit: async(args:any) => {
     try{
+      const payload = {}
       const { key, secret } = args
-      const payloadData = {}
-      const payload = await createPayload(payloadData);
-      const signatureHash = createSignature(payload,secret);
-      const data = { sig:signatureHash, ...payload }
-      const headers = createHeader(key);
+      const { data, headers } = await getReqConstructor({ key, secret, payload });
       const { data: {result:fiatDeposits} } = await axios.post(`${API_HOST}/api/fiat/deposit-history`, data, headers)
-      const fiatDepoitsOk:[FDeposit] = fiatDeposits.map(e => {
-        return {
-          ...e,
-          date: moment.unix(e.time).format("ll"),
-          time: moment.unix(e.time).format("LT"),
-        }
-      });
-      const totalBalances:FiatDeposit = { success: true, data: fiatDepoitsOk }
-      return totalBalances
+      return { success: true, data: fiatDeposits }
     }catch(err){
       return { success: false, data: [] }
     }
+  },
+
+  getCryptoDeposit: async(args:any) => {
+    try{
+      const payload = {}
+      const { key, secret } = args
+      const { data, headers } = await getReqConstructor({ key, secret, payload });
+      const { data: {result:cryptoDeposits} } = await axios.post(`${API_HOST}/api/crypto/deposit-history`, data, headers)
+      return { success: true, data: cryptoDeposits }
+    }catch(err){
+      return { success: false, data: [] }
+    }
+  },
+
+  getAllDeposit: async(args:any) => {
+    try{
+      const payload = {}
+      const { key, secret } = args
+      const { data, headers } = await getReqConstructor({ key, secret, payload });
+      const fiatDeposits = axios.post(`${API_HOST}/api/fiat/deposit-history`, data, headers)
+      const cryptoDeposits = axios.post(`${API_HOST}/api/crypto/deposit-history`, data, headers)
+      const [fiat, crypto] = await Promise.all([fiatDeposits, cryptoDeposits]);
+      return {
+        success: true,
+        fiat: fiat?.data?.result || [],
+        crypto: crypto?.data?.result || []
+      }
+    }catch(err){
+      return { success: false, fiat: [], crypto:[] }
+    }
   }
+
 }
 
 export { depositController }

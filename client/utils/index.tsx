@@ -18,3 +18,67 @@ export const decrypt = (hash:any) => {
   const decrpyted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()]);
   return decrpyted.toString();
 };
+
+export const getCoinSymbolIcon = (symbol:String) => {
+  return symbol.toLowerCase() == 'kub' 
+  ? "https://www.gofx.com/wp-content/uploads/2021/06/Bitkub-Coin.png"
+  : `https://cryptoicons.org/api/icon/${symbol.toLowerCase()}/200`
+}
+
+export const getCoinInfo = (key:string, getLink:boolean) => {
+  const bkCoins:any = {
+    BTC : "bitcoin",
+    ETH: "ethereum",
+    WAN: "wanchain",
+    ADA: "cardano",
+    OMG: "omg",
+    BCH: "bitcoin-cash",
+    LTC: "litecoin",
+    USDT: "tether",
+    XRP: "xrp",
+    IOST : "iostoken",
+    SNT : "status",
+    CVC: "civic",
+    ZIL: "zilliqa",
+    LINK: "chainlink",
+    ZRX: "0x",
+    KNC: "kyber-network-crystal-v2",
+    ENG: "enigma",
+    RDN : "raiden-network-token",
+    ABT : "arcblock",
+    MANA : "decentraland",
+    CTXC : "cortex",
+    INF : "infinitus-token",
+    SIX : "six",
+    XLM : "stellar",
+    JFIN : "jfin",
+    BNB : "binance-coin",
+    DOGE : "dogecoin",
+    EVX : "everex",
+    DAI : "multi-collateral-dai",
+    BAND : "band-protocol",
+    DOT : "polkadot-new",
+    KSM : "kusama",
+    USDC : "usd-coin",
+    BAT : "basic-attention-token",
+    NEAR : "near-protocol",
+    DON : "donnie-finance",
+    MKR : "maker",
+    COMP : "compound",
+    AAVE : "aave",
+    UNI : "uniswap",
+    YFI : "yearn-finance",
+    ALPHA: "alpha-finance-lab",
+    ENJ : "enjin-coin",
+    CRV : "curve-dao-token",
+    BAL : "balancer",
+    MATIC : "polygon",
+    KUB : "bitkub"
+  }
+  const coinAlias = bkCoins[key] || bkCoins[key.toLowerCase()] || bkCoins[key.toUpperCase()] || '';
+  return !getLink 
+  ? coinAlias
+  : (getLink && coinAlias == "bitkub") 
+    ? "https://www.bitkub.com/blog/bitkub-coin-2c4177fc03ea" 
+    : `https://coinmarketcap.com/currencies/${coinAlias}`
+}

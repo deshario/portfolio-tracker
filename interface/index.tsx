@@ -11,16 +11,37 @@ export interface TotalBalance {
 }
 
 export interface FDeposit {
+	txn_id: string
 	currency: string
 	amount: number
 	status: string
 	time: string
-	date: string
 }
 
 export interface FiatDeposit {
-	success: Boolean
+	success: boolean
 	data: [FDeposit]
+}
+
+export interface CDeposit {
+	currency: string
+	hash: string
+	amount: string
+	address: string
+	confirmations: number
+	status: string
+	time: string
+}
+
+export interface CryptoDeposit {
+	success: boolean
+	data: [CDeposit]
+}
+
+export interface AllDeposit {
+	success: boolean
+	fiat: [FDeposit]
+	crypto: [CDeposit]
 }
 
 export interface Ticker {

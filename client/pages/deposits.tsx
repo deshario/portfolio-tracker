@@ -1,17 +1,21 @@
-import { Row, Card, Tag, Col, Timeline, Space } from 'antd';
-import { QUERY_FIAT_DEPOSIT } from '../documents'
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useQuery } from '@apollo/client'
 import { useRecoilValue } from 'recoil';
 import { keySecret } from '../recoils/atoms/keySecret'
-import { useQuery } from '@apollo/client'
+import { QUERY_ALL_DEPOSIT } from '../documents'
+import { Row, Card, Tag, Col, Timeline, List, Avatar } from 'antd';
 import { CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
+import { getCoinInfo, getCoinSymbolIcon } from '../utils'
+import moment from 'moment'
 
 const Deposits = () => {
 
   const credentials = useRecoilValue(keySecret);
-  const [deposits, setDeposits] = useState([])
-
-  const { data } = useQuery(QUERY_FIAT_DEPOSIT, {
+  const [deposits, setDeposits] = useState({
+    fiat:[],
+    crypto: []
+  })
+  const { data } = useQuery(QUERY_ALL_DEPOSIT, {
     variables:{
       key: credentials.btKey,
       secret: credentials.btSecret
@@ -20,9 +24,9 @@ const Deposits = () => {
   })
 
   useEffect(() => {
-    if(data && data.getFiatDeposit){
-      const deposits: any = data?.getFiatDeposit
-      setDeposits(deposits?.data)
+    if(data && data.getAllDeposit){
+      const { fiat, crypto } = data.getAllDeposit
+      setDeposits({ fiat, crypto })
     }
   },[data]);
 
@@ -44,7 +48,6 @@ const Deposits = () => {
 
   const styles = {
     card: {
-      // width: 380,
       maxHeight: '100%'
     },
     cardBody: {
@@ -60,18 +63,21 @@ const Deposits = () => {
   return (
     <div>
       <Row gutter={[8, 16]}>
-        <Col span={9}>
+        <Col span={10}>
           <Card hoverable title="Fiat Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}>
             <Timeline>
               {
-                deposits.map((item:any, index:number) => {
+                deposits.fiat.map((item:any, index:number) => {
                   return (
                     <Timeline.Item
                       key={index}
                       dot={<ItemDot status={item.status}/>}
                       color={itemColor(item.status)}>
                         <span style={{ color:itemColor(item.status) }}>
-                          {THB(item.amount)} at {item.date}
+                          {THB(item.amount)} at 
+                          <Tag color='blue' style={{ marginLeft:'10px'}}>
+                            {moment.unix(item.time).format("MMMM Do YYYY, HH:mm")}
+                          </Tag>
                           <Tag color={itemColor(item.status)} style={{ marginLeft:'10px', float:'right'}}>
                             {item.status}
                           </Tag>
@@ -83,15 +89,32 @@ const Deposits = () => {
             </Timeline>
           </Card>
         </Col>
-        <Col span={15}>
+        <Col span={14}>
           <Card hoverable title="Crypto Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}>
+            <List
+              dataSource={deposits.crypto}
+              renderItem={(item:any) => (
+                <List.Item key={item.time}>
+                  <List.Item.Meta
+                    avatar={<Avatar src={getCoinSymbolIcon(item.currency)}/>}
+                    title={<a target="_blank" href={getCoinInfo(item.currency,true)}>{item.currency}</a>}
+                    description={item.amount}
+                  />
+                  <div style={{ textAlign: 'right' }}>
+                    <Tag color={itemColor(item.status)} >{item.status}</Tag>
+                    <br/>
+                    <Tag color='pink' style={{ marginTop:'5px'}}>
+                      {moment.unix(item.time).format("MMMM Do YYYY")}
+                    </Tag>
+                  </div>
+                </List.Item>
+              )}>
+            </List>
           </Card>
         </Col>
       </Row>
-      
     </div>
   )
 }
 
 export default Deposits
-
