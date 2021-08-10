@@ -22,7 +22,7 @@ export const decrypt = (hash:any) => {
 export const getCoinSymbolIcon = (symbol:String) => {
   return symbol.toLowerCase() == 'kub' 
   ? "https://www.gofx.com/wp-content/uploads/2021/06/Bitkub-Coin.png"
-  : `https://cryptoicons.org/api/icon/${symbol.toLowerCase()}/200`
+  : `https://www.bitkub.com/static/images/icons/${symbol}.png`
 }
 
 export const getCoinInfo = (key:string, getLink:boolean) => {

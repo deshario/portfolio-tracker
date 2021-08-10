@@ -1,11 +1,12 @@
 import { Row, Card, List, Avatar, Col } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { keySecret } from '../recoils/atoms/keySecret'
 import { useQuery } from '@apollo/client'
 import PieChart from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
 import { QUERY_BALANCE } from '../documents'
+import { getCoinInfo, getCoinSymbolIcon } from '../utils'
 
 const Home = () => {
 
@@ -80,7 +81,7 @@ const Home = () => {
     }
   };
 
-  console.log('render')
+  const pieData = useMemo(() => balances.pieData, [balances])
 
   return (
     <Row gutter={16}>
@@ -93,9 +94,9 @@ const Home = () => {
               <List.Item key={`${item.symbol}_${item.available}`}>
                 <List.Item.Meta
                   avatar={
-                    <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                    <Avatar src={getCoinSymbolIcon(item.symbol)} />
                   }
-                  title={<a>{item.symbol}</a>}
+                  title={<a href={getCoinInfo(item.symbol,true)} target="_blank">{item.symbol}</a>}
                   description={item.available}
                 />
                 <div style={{ textAlign: 'right' }}>
@@ -121,7 +122,7 @@ const Home = () => {
               enabled: false
             },
             series: [{
-              data: balances.pieData
+              data: pieData
             }],
           }}
         />

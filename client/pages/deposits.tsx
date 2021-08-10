@@ -97,7 +97,7 @@ const Deposits = () => {
                 <List.Item key={item.time}>
                   <List.Item.Meta
                     avatar={<Avatar src={getCoinSymbolIcon(item.currency)}/>}
-                    title={<a target="_blank" href={getCoinInfo(item.currency,true)}>{item.currency}</a>}
+                    title={<a href={getCoinInfo(item.currency,true)} target="_blank">{item.currency}</a>}
                     description={item.amount}
                   />
                   <div style={{ textAlign: 'right' }}>
