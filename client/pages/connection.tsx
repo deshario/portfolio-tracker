@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Card, Form, Input, Button, notification } from 'antd';
 import { useRecoilState } from 'recoil';
-import { keySecret } from '../recoils/atoms/keySecret'
+import { keySecret } from '../recoils/atoms'
 
 const Connection = () => {
 

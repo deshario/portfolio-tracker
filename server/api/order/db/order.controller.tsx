@@ -1,5 +1,4 @@
 import { API_HOST, getReqConstructor } from '../../../config/handler'
-import { balanceController } from '../../balance/db/balance.controller'
 import axios from 'axios';
 
 const orderController = {
@@ -15,7 +14,6 @@ const orderController = {
       return { success: false, data: [] }
     }
   }
-
 }
 
 export { orderController }

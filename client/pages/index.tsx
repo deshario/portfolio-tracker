@@ -1,7 +1,7 @@
 import { Row, Card, List, Avatar, Col } from 'antd';
-import { useEffect, useState, useMemo } from 'react';
-import { useRecoilValue } from 'recoil';
-import { keySecret } from '../recoils/atoms/keySecret'
+import { useEffect, useState } from 'react';
+import { useRecoilValue, useRecoilState } from 'recoil';
+import { keySecret, avCoins } from '../recoils/atoms'
 import { useQuery } from '@apollo/client'
 import PieChart from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
@@ -11,6 +11,8 @@ import { getCoinInfo, getCoinSymbolIcon } from '../utils'
 const Home = () => {
 
   const credentials = useRecoilValue(keySecret);
+  const [availableCoins, setAvailableCoins] = useRecoilState(avCoins);
+  
   const [balances, setBalances] = useState({
     listData: [],
     pieData: [],
@@ -63,6 +65,10 @@ const Home = () => {
         }
       });
 
+      const coinsOnly = mData.balances.map((sym:any) => `THB_${sym.symbol}`)
+
+      setAvailableCoins(coinsOnly);
+
       setBalances({
         listData: totalBalances,
         pieData: chartData,
@@ -81,10 +87,8 @@ const Home = () => {
     }
   };
 
-  const pieData = useMemo(() => balances.pieData, [balances])
-
   return (
-    <Row gutter={16}>
+    <Row gutter={[8, 16]}>
       <Col>
         <Card hoverable style={styles.card} bodyStyle={styles.cardBody}>
           <List
@@ -122,7 +126,7 @@ const Home = () => {
               enabled: false
             },
             series: [{
-              data: pieData
+              data: balances.pieData
             }],
           }}
         />
