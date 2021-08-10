@@ -16,7 +16,7 @@ const Home = () => {
     totalValue: '',
   })
 
-  const { data, loading, error } = useQuery(QUERY_BALANCE, {
+  const { data } = useQuery(QUERY_BALANCE, {
     variables:{
       key: credentials.btKey,
       secret: credentials.btSecret
@@ -69,8 +69,7 @@ const Home = () => {
       })
       
     }
-    if (error) console.log(`Err: ${error}`)
-  }, [loading, error, data])
+  }, [data])
 
   const styles = {
     card: {
@@ -80,6 +79,8 @@ const Home = () => {
       paddingBottom: 'unset'
     }
   };
+
+  console.log('render')
 
   return (
     <Row gutter={16}>

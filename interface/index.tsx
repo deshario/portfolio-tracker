@@ -51,3 +51,20 @@ export interface Ticker {
 	highestBid: number
 	percentChange: string
 }
+
+export interface MOrder {
+	txn_id: string
+	order_id: string
+	hash: string
+	type: string
+	rate: string
+	fee: string
+	credit: string
+	amount: string
+	ts: string
+}
+
+export interface Order{
+	success: Boolean
+	data: [MOrder]
+}
