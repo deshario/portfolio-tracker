@@ -36,17 +36,18 @@ const Home = () => {
     const mData: any = data?.getBalance
     if(mData && mData.success){
 
-      const netWorth = mData.balances.reduce((totalPrice:any, eachItem:any) => {
+      const netWorth =  mData.balances.reduce((totalPrice:any, eachItem:any) => {
         const available = Number(eachItem.available);
         const value = Number(eachItem.value);
-        totalPrice = totalPrice+(available*value)
+        const thVal = eachItem.symbol == "THB" ? available*1 : available*value;
+        totalPrice = totalPrice+(thVal)
         return totalPrice;
       },0);
 
-      const totalBalances = mData.balances.map((eachItem:any) => {
+      const totalBalances =  mData.balances.map((eachItem:any) => {
         const available = Number(eachItem.available);
         const value = Number(eachItem.value);
-        const totalValue = available*value;
+        const totalValue = eachItem.symbol == "THB" ? available*1 : available*value
         const percent = (totalValue / Number(netWorth)) * 100;
         return {
           ...eachItem,
