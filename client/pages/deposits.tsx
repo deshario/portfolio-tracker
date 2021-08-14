@@ -115,6 +115,6 @@ const Deposits = () => {
       </Row>
     </div>
   )
-}
+} 
 
 export default Deposits

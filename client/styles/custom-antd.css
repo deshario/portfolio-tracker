@@ -69,6 +69,30 @@ section.content-light{
   padding-bottom: unset;
 }
 
+/* Login Form */
+.loginBtn, .registerBtn, .updateBtn{
+  width: 100% !important;
+  background: #764ba2;
+  padding:10px;
+  font-size:18px;
+  margin-top:15px;
+  height:max-content;
+  transition: transform .5s ease;
+
+}
+
+.loginBtn:hover, .registerBtn:hover, .updateBtn:hover{
+  background: #764ba2;
+  transform: scale(1.05);
+}
+
+.signUpLabel{
+  text-align: center;
+  font-size: 1.1em;
+  margin-block-end: unset;
+  cursor: pointer;
+}
+
 
 /* .ant-layout-content{
   background:green !important;

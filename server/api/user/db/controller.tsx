@@ -1,7 +1,7 @@
 import passport from "passport"
 import User, { IUser } from "./model"
 import { IQuerys, IId, IAuth, IToken, IContext, BKCredentials, ValidCredentials } from "../../../../interface"
-import { refreshToken, signToken, verifyJWT } from "../../../auth/auth.service"
+import { refreshToken, signToken, verifyJWT, verifyCredentials } from "../../../auth/auth.service"
 import { API_HOST, getReqConstructor } from '../../../config/handler'
 import axios from 'axios';
 
@@ -32,14 +32,17 @@ const userController = {
 
   signin: async (payload: IAuth): Promise<IUser> => {
     return new Promise((resolve, reject): void => {
-      passport.authenticate("local", (err: any, user: any, info: any) => {
+      passport.authenticate("local", async (err: any, user: any, info: any) => {
         const error = err || info
         if (error) return reject(error.message)
         if (!user) return reject("Something went wrong, please try again.")
+        const { credentials : { key, secret } } = user
+        const { valid } = await verifyCredentials({ key, secret })
         resolve({
           ...user.profile,
           token: signToken(user.payload4Sign, payload.remember),
-          rtoken: refreshToken(user)
+          rtoken: refreshToken(user),
+          validKey : valid
         })
       })
       ({ body: payload })
@@ -79,31 +82,29 @@ const userController = {
   setCredentials: async (payload: any, context:IContext): Promise<BKCredentials> => {
     try {
       const { key, secret } = payload
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: context?.user?._id },
-        { credentials: { key, secret } },
-        { new: true }
-      )
-      return {
-        success: updatedUser ? true: false,
-        email: updatedUser ? updatedUser?.email : ''
+      const { valid } = await verifyCredentials({ key, secret })
+      if(valid){
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context?.user?._id },
+          { credentials: { key, secret } },
+          { new: true }
+        )
+        return {
+          success: updatedUser ? true: false,
+          email: updatedUser ? updatedUser?.email : '',
+          info: updatedUser ? 'Key Updated' : ''
+        }
+      }else{
+        return { success: false, info: 'Invalid Key' };
       }
     }catch(err){
-      return { success: false, email: '' };
+      return { success: false, info: 'Something went wrong' };
     }
   },
   
   validateCredentials: async (args: any): Promise<ValidCredentials> => {
-    try{
-      const payload = {}
-      const { key, secret } = args
-      const { data, headers } = await getReqConstructor({ key, secret, payload });
-      const fiatDeposits = await axios.post(`${API_HOST}/api/fiat/deposit-history?lmt=1`, data, headers)
-      const isValidConnection = fiatDeposits?.data?.error == 0
-      return { valid: isValidConnection };
-    }catch(err){
-      return { valid: false };
-    }
+    const { key, secret } = args
+    return verifyCredentials({ key, secret })
   }
 
 }

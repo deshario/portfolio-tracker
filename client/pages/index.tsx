@@ -7,8 +7,12 @@ import PieChart from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
 import { QUERY_BALANCE } from '../documents'
 import { getCoinInfo, getCoinSymbolIcon } from '../utils'
+import Cookies from "next-cookies"
+import Router from "next/router"
+import { IInitialProps } from '../../interface'
+import { NextPage } from "next"
 
-const Home = () => {
+const Home: NextPage<IInitialProps> = ({ user, token }) => {
 
   const credentials = useRecoilValue(keySecret);
   const [availableCoins, setAvailableCoins] = useRecoilState(avCoins);
@@ -134,6 +138,23 @@ const Home = () => {
       </Col>
     </Row>
   )
+}
+
+Home.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
+  const { req, res } = ctx
+  const userAgent: string = req ? req.headers["user-agent"] || "" : navigator.userAgent
+  const { user, token }: any = Cookies(ctx)
+  if (!user?._id) {
+    if (res) {
+      res.writeHead(302, {
+        Location: "/authentication",
+      })
+      res.end()
+    } else {
+      Router.push({ pathname: "/authentication" })
+    }
+  }
+  return { userAgent, user, token }
 }
 
 export default Home;

@@ -110,9 +110,21 @@ export interface ReqRes {
 
 export interface BKCredentials {
 	success: boolean
-	email: string
+	email?: string
+	info?: string
 }
 
 export interface ValidCredentials {
 	valid: boolean
+}
+
+export interface IInitialProps {
+  userAgent?: string
+  user?: any
+  guestMode?: boolean,
+  form?: any
+  pathname?: string
+  query?: any
+  token?: any,
+  namespacesRequired?: [string]
 }

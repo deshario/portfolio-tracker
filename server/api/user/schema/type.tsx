@@ -18,6 +18,7 @@ const userType = gql`
     provider: String
     token: String
     rtoken: String
+    validKey: Boolean
     createdAt: Date
     updatedAt: Date
   }
@@ -25,6 +26,7 @@ const userType = gql`
   type bkCredentials {
     success: Boolean
     email: String
+    info: String
   }
 
   type validCredentials {

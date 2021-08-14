@@ -19,8 +19,10 @@ const userResolver = {
     async signin(parent: any, payload: IAuth, context: any): Promise<IUser | null> {
       try{
         const result: IUser | null = await userController.signin(payload)
-        if(result) setAuthCookie(context.res, result.token, result.rtoken, result)
-      return result
+        if(result){
+          setAuthCookie(context.res, result.token, result.rtoken, result)
+        }
+        return result
       }catch(err){
         throw new Error(err)
       }

@@ -16,7 +16,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       </Head>
       <ApolloProvider client={apolloClient}>
         <RecoilRoot>
-          <TrackerLayout>
+          <TrackerLayout {...pageProps}>
             <Component {...pageProps} />
           </TrackerLayout>
         </RecoilRoot>
