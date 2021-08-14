@@ -5,4 +5,5 @@ const orderQuery = gql`
     getMyOrderHistory(key: String!, secret: String! sym:String!): Orders
 	}
 `
+
 export { orderQuery }

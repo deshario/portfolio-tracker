@@ -107,3 +107,12 @@ export interface ReqRes {
   req: express.Request
   res: express.Response
 }
+
+export interface BKCredentials {
+	success: boolean
+	email: string
+}
+
+export interface ValidCredentials {
+	valid: boolean
+}

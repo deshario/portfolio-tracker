@@ -8,4 +8,5 @@ const depositQuery = gql`
     getAllDeposit(key: String!, secret: String!): AllDeposit
 	}
 `
+
 export { depositQuery }

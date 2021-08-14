@@ -1,61 +1,51 @@
-import userController from "./db/controller"
-import {
-  authenticate,
-  resetAuthCookie,
-  setAuthCookie
-} from "../../auth/auth.service"
 import { IUser } from "./db/model"
-import {
-  IAuth,
-  IContext,
-  IId,
-  IQuerys,
-  IToken
-} from "../../../interface"
+import userController from "./db/controller"
+import { authenticate, resetAuthCookie, setAuthCookie } from "../../auth/auth.service"
+import { IAuth, IContext, IId, IQuerys, IToken, BKCredentials, ValidCredentials } from "../../../interface"
 
 const userResolver = {
   Query: {
-    users(root: any, args: IQuerys, context: IContext): Promise<IUser[] | null> {
-      authenticate(context)
+    users(parent: any, args: IQuerys, context: IContext): Promise<IUser[] | null> {
       return userController.users(args)
     },
-    user(root: any, args: IId, context: IContext): Promise<IUser | null> {
-      authenticate(context)
+    user(parent: any, args: IId, context: IContext): Promise<IUser | null> {
       return userController.user(context.user)
     },
   },
   Mutation: {
-    signup(parent: any, args: IAuth, context: IContext): Promise<IUser | null> {
-      return userController.signup(args, context)
+    signup(parent: any, payload: IAuth, context: IContext): Promise<IUser | null> {
+      return userController.signup(payload, context)
     },
-
-    async signin(root: any, args: IAuth, context: any): Promise<IUser | null> {
-      const result: IUser | null = await userController.signin(args, context)
-      .catch((err) => {
-        throw new Error(err)
-      })
-
-      if(result) {
-        setAuthCookie(context.res, result.token, result.rtoken, result)
-      }
+    async signin(parent: any, payload: IAuth, context: any): Promise<IUser | null> {
+      try{
+        const result: IUser | null = await userController.signin(payload)
+        if(result) setAuthCookie(context.res, result.token, result.rtoken, result)
       return result
+      }catch(err){
+        throw new Error(err)
+      }
     },
-
-    async signout(parent: any, args: {}, context: IContext): Promise<IUser | null> {
+    async signout(parent: any, payload: {}, context: IContext): Promise<IUser | null> {
       authenticate(context)
       resetAuthCookie(context.res)
       const result: IUser | null = await userController.signout(context.user)
       return result
     },
-   
-    async token(root: any, args: IToken, context: IContext): Promise<IUser | null> {
-      const result = await userController.token(args)
+    async token(parent: any, payload: IToken, context: IContext): Promise<IUser | null> {
+      const result = await userController.token(payload)
       if(result) {
         setAuthCookie(context.res, result.token, result.rtoken, result)
       }
       return result
     },
-    
+    validateCredentials(parent: any, payload: any, context: IContext): Promise<ValidCredentials> {
+      authenticate(context);
+      return userController.validateCredentials(payload);
+    },
+    setCredentials(parent: any, payload: any, context: IContext): Promise<BKCredentials> {
+      authenticate(context);
+      return userController.setCredentials(payload, context);
+    }
   }
 }
 

@@ -21,6 +21,16 @@ const userType = gql`
     createdAt: Date
     updatedAt: Date
   }
+
+  type bkCredentials {
+    success: Boolean
+    email: String
+  }
+
+  type validCredentials {
+    valid: Boolean
+  }
+
 `
 
 export { userType }

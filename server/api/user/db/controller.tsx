@@ -1,7 +1,9 @@
 import passport from "passport"
 import User, { IUser } from "./model"
-import { IQuerys, IId, IAuth, IToken, IContext } from "../../../../interface"
+import { IQuerys, IId, IAuth, IToken, IContext, BKCredentials, ValidCredentials } from "../../../../interface"
 import { refreshToken, signToken, verifyJWT } from "../../../auth/auth.service"
+import { API_HOST, getReqConstructor } from '../../../config/handler'
+import axios from 'axios';
 
 import { setupLocalStrategy } from "../../../auth"
 
@@ -28,7 +30,7 @@ const userController = {
     return user
   },
 
-  signin: async (data: IAuth, context: IContext): Promise<IUser> => {
+  signin: async (payload: IAuth): Promise<IUser> => {
     return new Promise((resolve, reject): void => {
       passport.authenticate("local", (err: any, user: any, info: any) => {
         const error = err || info
@@ -36,19 +38,17 @@ const userController = {
         if (!user) return reject("Something went wrong, please try again.")
         resolve({
           ...user.profile,
-          token: signToken(user.payload4Sign, data.remember),
+          token: signToken(user.payload4Sign, payload.remember),
           rtoken: refreshToken(user)
         })
       })
-      ({ body: data })
+      ({ body: payload })
     })
   },
 
-  token: async (data: IToken): Promise<IUser | null> => {
-    const user = await User.findOne({ email: data.email, rtoken: data.rtoken })
-    if (!user) {
-      throw new Error("E-mail not found.")
-    }
+  token: async (payload: IToken): Promise<IUser | null> => {
+    const user = await User.findOne({ email: payload.email, rtoken: payload.rtoken })
+    if (!user) throw new Error("E-mail not found.")
     return {
       ...user.profile,
       token: signToken(user.payload4Sign),
@@ -73,6 +73,36 @@ const userController = {
       return user && user;
     } catch (err) {
       return { authorized: false, error: err }
+    }
+  },
+
+  setCredentials: async (payload: any, context:IContext): Promise<BKCredentials> => {
+    try {
+      const { key, secret } = payload
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: context?.user?._id },
+        { credentials: { key, secret } },
+        { new: true }
+      )
+      return {
+        success: updatedUser ? true: false,
+        email: updatedUser ? updatedUser?.email : ''
+      }
+    }catch(err){
+      return { success: false, email: '' };
+    }
+  },
+  
+  validateCredentials: async (args: any): Promise<ValidCredentials> => {
+    try{
+      const payload = {}
+      const { key, secret } = args
+      const { data, headers } = await getReqConstructor({ key, secret, payload });
+      const fiatDeposits = await axios.post(`${API_HOST}/api/fiat/deposit-history?lmt=1`, data, headers)
+      const isValidConnection = fiatDeposits?.data?.error == 0
+      return { valid: isValidConnection };
+    }catch(err){
+      return { valid: false };
     }
   }
 

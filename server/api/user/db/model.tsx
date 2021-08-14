@@ -7,6 +7,10 @@ export interface IUser extends Document {
   email: string
   password: string
   provider: string
+  credentials: {
+    key: string
+    secret: string
+  },
   salt: string
   token: string
   rtoken: string
@@ -42,6 +46,16 @@ const UserSchema = new Schema<IUser & Document>({
   provider: {
     type: String,
     default: "local"
+  },
+  credentials: {
+    key: {
+      type: String,
+      trim: true
+    },
+    secret: {
+      type: String,
+      trim: true
+    },
   },
   salt: String,
   rtoken: String,

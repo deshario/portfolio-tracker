@@ -5,4 +5,5 @@ const tickerQuery = gql`
     getTickers(key: String!, secret: String!): [Ticker]
 	}
 `
+
 export { tickerQuery }
