@@ -1,3 +1,5 @@
+import express from "express"
+
 export interface Balance {
 	available: string
 	reserved: string
@@ -67,4 +69,41 @@ export interface MOrder {
 export interface Order{
 	success: Boolean
 	data: [MOrder]
+}
+
+export interface IQuerys {
+  query: string
+  where: any
+  sort: string
+  skip: number
+  limit: number
+}
+
+export interface IId {
+  _id: string
+}
+
+export interface IAuth {
+  email: string
+  password: string
+  remember?: boolean
+}
+
+export interface IToken {
+  email: string
+  rtoken: string
+}
+
+export interface IContext {
+  url?: string
+  user?: any
+  error?: any
+  authorized?: boolean
+  req: express.Request
+  res: express.Response
+}
+
+export interface ReqRes {
+  req: express.Request
+  res: express.Response
 }
