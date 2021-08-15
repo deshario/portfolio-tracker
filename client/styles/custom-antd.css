@@ -70,7 +70,8 @@ section.content-light{
 }
 
 /* Login Form */
-.loginBtn, .registerBtn, .updateBtn{
+.loginBtn, .registerBtn, .updateBtn,
+.loginBtn:focus, .registerBtn:focus, .updateBtn:focus{
   width: 100% !important;
   background: #764ba2;
   padding:10px;
@@ -78,7 +79,6 @@ section.content-light{
   margin-top:15px;
   height:max-content;
   transition: transform .5s ease;
-
 }
 
 .loginBtn:hover, .registerBtn:hover, .updateBtn:hover{

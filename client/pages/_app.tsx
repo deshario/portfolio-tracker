@@ -1,10 +1,10 @@
 import React from 'react'
+import Head from 'next/head'
 import { AppProps } from 'next/app'
 import { RecoilRoot } from 'recoil';
-import Head from 'next/head'
-import TrackerLayout from './components/layout'
 import { ApolloProvider } from "@apollo/client";
 import { useApollo } from "../lib/apollo";
+import RootLayout from '../components/RootLayout'
 import '../styles/antd-global.css'
 
 const App = ({ Component, pageProps }: AppProps) => {
@@ -16,9 +16,9 @@ const App = ({ Component, pageProps }: AppProps) => {
       </Head>
       <ApolloProvider client={apolloClient}>
         <RecoilRoot>
-          <TrackerLayout {...pageProps}>
+          <RootLayout {...pageProps}>
             <Component {...pageProps} />
-          </TrackerLayout>
+          </RootLayout>
         </RecoilRoot>
       </ApolloProvider>
     </>

@@ -1,3 +1,4 @@
+import { NextPage } from "next"
 import { Row, Card, List, Avatar, Col } from 'antd';
 import { useEffect, useState } from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
@@ -10,7 +11,6 @@ import { getCoinInfo, getCoinSymbolIcon } from '../utils'
 import Cookies from "next-cookies"
 import Router from "next/router"
 import { IInitialProps } from '../../interface'
-import { NextPage } from "next"
 
 const Home: NextPage<IInitialProps> = ({ user, token }) => {
 
@@ -144,15 +144,19 @@ Home.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
   const { req, res } = ctx
   const userAgent: string = req ? req.headers["user-agent"] || "" : navigator.userAgent
   const { user, token }: any = Cookies(ctx)
-  if (!user?._id) {
+  const redirect = (path:string) => {
     if (res) {
-      res.writeHead(302, {
-        Location: "/authentication",
-      })
+      res.writeHead(302, { Location: path })
       res.end()
     } else {
-      Router.push({ pathname: "/authentication" })
+      Router.push({ pathname: path })
     }
+  }
+  if (!user?._id){
+    redirect("/auth/login")
+  }
+  if(user?._id && !user?.validKey){
+    redirect("/auth/credentials")
   }
   return { userAgent, user, token }
 }

@@ -1,16 +1,41 @@
 import { useMemo } from "react";
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
+import Cookies from 'next-cookies'
 
 let apolloClient:any;
 
-function createApolloClient() {
+const setHeader = (operation: any, token: string) => {
+  operation.setContext(({ headers = {} }: any): any => {
+    return {
+      headers: {
+        ...headers,
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    }
+  })
+
+  return operation
+}
+
+const createApolloClient = () => {
+
+  const httpLink = new HttpLink({
+    uri: "/playground",
+    credentials: 'same-origin',
+  })
+
+  const authLink = new ApolloLink((operation, forward): any => {
+    const { token } = Cookies(operation.getContext())
+    setHeader(operation, token || '')
+    return forward(operation)
+  })
+
   return new ApolloClient({
     ssrMode: typeof window === "undefined",
-    link: new HttpLink({
-      uri: "/playground",
-    }),
+    link : ApolloLink.from([authLink, httpLink]),
     cache: new InMemoryCache(),
   });
+
 }
 
 export function initializeApollo(initialState = {}) {
