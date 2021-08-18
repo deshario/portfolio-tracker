@@ -82,3 +82,8 @@ export const getCoinInfo = (key:string, getLink:boolean) => {
     ? "https://www.bitkub.com/blog/bitkub-coin-2c4177fc03ea" 
     : `https://coinmarketcap.com/currencies/${coinAlias}`
 }
+
+export const thbCurrency = (amount:number|string) => {
+  let amountNum =  typeof amount == 'string' ? Number(amount) : amount
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amountNum).replace('$','฿')
+}

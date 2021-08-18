@@ -1,0 +1,5 @@
+NODE_ENV=development
+HOSTNAME="localhost"
+PORT=3000
+JWT_SECRET = "optimus"
+MONGO_URL = "mongodb://localhost:27017/portfolio-tracker"

@@ -6,7 +6,7 @@ const userMutation = gql`
     signin(email: String!, password: String!, remember: Boolean): Auth
     token(email: String!, rtoken: String!): Auth
     validateCredentials(key:String! secret:String!) : validCredentials
-    setCredentials(key:String! secret:String!) : bkCredentials
+    setCredentials(key:String! secret:String! token:String!) : bkCredentials
     signout: User
   }
 `

@@ -1,29 +1,24 @@
 import express from 'express'
 import next from 'next';
 import session from "express-session"
-import dotenv from 'dotenv'
 import passport from "passport"
 import cookieParser from "cookie-parser"
 import { createServer } from "http";
 import { ReqRes } from "./interface"
 import { ApolloServer } from 'apollo-server-express'
 import { schema } from './server/config/apollo'
-import crypto from "crypto"
+import { NODE_ENV, HOSTNAME, PORT, JWT_SECRET } from "./server/config/environment"
 import userController from "./server/api/user/db/controller"
+import crypto from "crypto"
 
-dotenv.config();
-
-const dev = process.env.NODE_ENV !== 'production';
+const dev = NODE_ENV !== 'production';
 const nextApp = next({ dev, dir: "./client" });
 const handle = nextApp.getRequestHandler();
 
 (async () => {
   await nextApp.prepare();
   const app = express();
-  const HOSTNAME = process.env.HOSTNAME || "localhost";
-  const PORT = process.env.PORT || 3000;
-
-  const isProdEnv = process.env.NODE_ENV === 'production';
+  const isProdEnv = NODE_ENV === 'production';
   const ORIGIN = `${isProdEnv ? 'https' : 'http'}://${HOSTNAME}:${PORT}`;
 
   const apolloApp = new ApolloServer({
@@ -46,7 +41,7 @@ const handle = nextApp.getRequestHandler();
   app.use(
     session({
       genid: (req: express.Request): string => crypto.randomBytes(16).toString("hex"),
-      secret: "optimus",
+      secret: JWT_SECRET,
       resave: false,
       saveUninitialized: false,
       cookie: {

@@ -13,7 +13,6 @@ const setHeader = (operation: any, token: string) => {
       },
     }
   })
-
   return operation
 }
 
@@ -25,8 +24,8 @@ const createApolloClient = () => {
   })
 
   const authLink = new ApolloLink((operation, forward): any => {
-    const { token } = Cookies(operation.getContext())
-    setHeader(operation, token || '')
+    const { bptToken } = Cookies(operation.getContext())
+    setHeader(operation, bptToken || '')
     return forward(operation)
   })
 

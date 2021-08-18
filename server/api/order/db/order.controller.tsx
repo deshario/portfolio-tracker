@@ -10,7 +10,6 @@ const orderController = {
       const { data: { result : symbolData } } = await axios.post(`${API_HOST}/api/market/my-order-history`, data, headers)
       return { success: true, data: symbolData || [] }
     }catch(err){
-      console.log('\nErr : ',err)
       return { success: false, data: [] }
     }
   }

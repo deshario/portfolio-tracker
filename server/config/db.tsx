@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import { MONGO_URL } from "./environment"
 
 let config: any = {
   useUnifiedTopology: true,
@@ -7,6 +8,6 @@ let config: any = {
   useFindAndModify: false
 }
 
-mongoose.connect('mongodb://localhost:27017/portfolio-tracker', config)
+mongoose.connect(MONGO_URL, config)
 
 export default mongoose

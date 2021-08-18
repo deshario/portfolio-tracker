@@ -5,7 +5,7 @@ import { keySecret } from '../recoils/atoms/keySecret'
 import { QUERY_ALL_DEPOSIT } from '../documents'
 import { Row, Card, Tag, Col, Timeline, List, Avatar } from 'antd';
 import { CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { getCoinInfo, getCoinSymbolIcon } from '../utils'
+import { getCoinInfo, getCoinSymbolIcon, thbCurrency } from '../utils'
 import moment from 'moment'
 
 const Deposits = () => {
@@ -29,11 +29,6 @@ const Deposits = () => {
       setDeposits({ fiat, crypto })
     }
   },[data]);
-
-  const THB = (amount:number|string) => {
-    let amountNum =  typeof amount == 'string' ? Number(amount) : amount
-    return new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(amountNum)
-  }
 
   type Status = { status: string; }
   
@@ -74,7 +69,7 @@ const Deposits = () => {
                       dot={<ItemDot status={item.status}/>}
                       color={itemColor(item.status)}>
                         <span style={{ color:itemColor(item.status) }}>
-                          {THB(item.amount)} at 
+                          {thbCurrency(item.amount)} at 
                           <Tag color='blue' style={{ marginLeft:'10px'}}>
                             {moment.unix(item.time).format("MMMM Do YYYY, HH:mm")}
                           </Tag>

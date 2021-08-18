@@ -1,7 +1,7 @@
 import { Row, Col, Card } from 'antd';
 import styled from 'styled-components'
 
-const AuthLayout: React.FC<{ user: any }> = (props) => {
+const AuthLayout: React.FC<{ bptUser: any }> = (props) => {
 
   const styles = {
     card: {

@@ -120,11 +120,9 @@ export interface ValidCredentials {
 
 export interface IInitialProps {
   userAgent?: string
-  user?: any
-  guestMode?: boolean,
+  bptUser?: any
+  bptToken?: any,
   form?: any
   pathname?: string
   query?: any
-  token?: any,
-  namespacesRequired?: [string]
 }

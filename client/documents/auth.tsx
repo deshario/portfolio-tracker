@@ -51,8 +51,8 @@ export const SIGNOUT = gql`
 `
 
 export const SetCredentials = gql`
-  mutation setCredentials($key:String!, $secret:String!){
-    setCredentials(key:$key, secret:$secret){
+  mutation setCredentials($key:String!, $secret:String! $token:String!){
+    setCredentials(key:$key, secret:$secret token:$token){
       success
       info
       email

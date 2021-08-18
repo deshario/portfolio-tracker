@@ -8,7 +8,7 @@ import { useMutation } from '@apollo/client'
 
 const { Header, Content, Sider } = Layout;
 
-const TrackerLayout: React.FC<{ user: any }> = (props) => {
+const TrackerLayout: React.FC<{ bptUser: any }> = (props) => {
 
   const [signout]: any = useMutation(SIGNOUT,{
     onCompleted: ({ signout : { _id } }) => {
@@ -18,6 +18,7 @@ const TrackerLayout: React.FC<{ user: any }> = (props) => {
       }
     },
     onError: (err) => {
+      console.log('signput',err);
       notification.error({ message: 'Logout Error', description: 'Please try again' })
     }
   })

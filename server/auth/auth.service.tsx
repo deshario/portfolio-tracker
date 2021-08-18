@@ -1,15 +1,14 @@
 import express from "express"
 import { AuthenticationError } from "apollo-server-express"
-import crypto from "crypto"
-import jwt from "jsonwebtoken"
-import moment from "moment"
 import { IUser } from "../api/user/db/model"
 import { IContext } from "../../interface"
 import { API_HOST, getReqConstructor } from '../config/handler'
+import { JWT_SECRET } from "../config/environment"
+import crypto from "crypto"
+import jwt from "jsonwebtoken"
 import axios from 'axios';
+import moment from "moment"
 
-
-const JWT_SECRET = "optimus"
 const TOKEN_EXPIRE: number = 10
 const RTOKEN_EXPIRE: number = TOKEN_EXPIRE * 3
 const MAX_AGE: number = (24 * 60 * 60 * 1000) * TOKEN_EXPIRE
@@ -62,25 +61,19 @@ export const verifyCredentials = async ({ key, secret }) => {
   }
 }
 
-export const setAuthCookie = (
-  res: express.Response,
-  token: string,
-  rtoken: string,
-  user: any
-): express.Response => {
+export const setAuthCookie = (res: express.Response, token: string, rtoken: string, user: any): express.Response => {
   if (token && rtoken && user) {
-    res.cookie("token", token, { maxAge: MAX_AGE })
-    res.cookie("rtoken", rtoken, { maxAge: MAX_AGE })
-    res.cookie("user", user, { maxAge: MAX_AGE })
+    res.cookie("bptToken", token, { maxAge: MAX_AGE })
+    res.cookie("bptRtoken", rtoken, { maxAge: MAX_AGE })
+    res.cookie("bptUser", user, { maxAge: MAX_AGE })
   }
-
   return res
 }
 
 export const resetAuthCookie = (res: express.Response): express.Response => {
-  res.clearCookie("token")
-  res.clearCookie("rtoken")
-  res.clearCookie("user")
+  res.clearCookie("bptToken")
+  res.clearCookie("bptRtoken")
+  res.clearCookie("bptUser")
   return res
 }
 

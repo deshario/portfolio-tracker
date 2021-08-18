@@ -7,12 +7,12 @@ import { useQuery } from '@apollo/client'
 import PieChart from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
 import { QUERY_BALANCE } from '../documents'
-import { getCoinInfo, getCoinSymbolIcon } from '../utils'
+import { getCoinInfo, getCoinSymbolIcon, thbCurrency } from '../utils'
 import Cookies from "next-cookies"
 import Router from "next/router"
 import { IInitialProps } from '../../interface'
 
-const Home: NextPage<IInitialProps> = ({ user, token }) => {
+const Home: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
 
   const credentials = useRecoilValue(keySecret);
   const [availableCoins, setAvailableCoins] = useRecoilState(avCoins);
@@ -30,11 +30,6 @@ const Home: NextPage<IInitialProps> = ({ user, token }) => {
     },
     fetchPolicy: "network-only",
   })
-
-  const THB = (amount:number|string) => {
-    let amountNum =  typeof amount == 'string' ? Number(amount) : amount
-    return new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(amountNum)
-  }
 
   useEffect(() => {
     const mData: any = data?.getBalance
@@ -98,7 +93,7 @@ const Home: NextPage<IInitialProps> = ({ user, token }) => {
         <Card hoverable style={styles.card} bodyStyle={styles.cardBody}>
           <List
             dataSource={balances.listData}
-            header={<div>Total Value : {THB(balances.totalValue)}</div>}
+            header={<div>Total Value : {thbCurrency(balances.totalValue)}</div>}
             renderItem={(item:any) => (
               <List.Item key={`${item.symbol}_${item.available}`}>
                 <List.Item.Meta
@@ -110,7 +105,7 @@ const Home: NextPage<IInitialProps> = ({ user, token }) => {
                 />
                 <div style={{ textAlign: 'right' }}>
                   <span>{item.percent}%</span><br/>
-                  <span style={{ color:'green' }}>{THB(item.realValue)}</span>
+                  <span style={{ color:'green' }}>{thbCurrency(item.realValue)}</span>
                 </div>
               </List.Item>
             )}>
@@ -143,7 +138,7 @@ const Home: NextPage<IInitialProps> = ({ user, token }) => {
 Home.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
   const { req, res } = ctx
   const userAgent: string = req ? req.headers["user-agent"] || "" : navigator.userAgent
-  const { user, token }: any = Cookies(ctx)
+  const { bptUser, bptToken }: any = Cookies(ctx)
   const redirect = (path:string) => {
     if (res) {
       res.writeHead(302, { Location: path })
@@ -152,13 +147,13 @@ Home.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
       Router.push({ pathname: path })
     }
   }
-  if (!user?._id){
+  if (!bptUser?._id){
     redirect("/auth/login")
   }
-  if(user?._id && !user?.validKey){
+  if(bptUser?._id && !bptUser?.validKey){
     redirect("/auth/credentials")
   }
-  return { userAgent, user, token }
+  return { userAgent, bptUser, bptToken }
 }
 
 export default Home;

@@ -8,7 +8,7 @@ import { SetCredentials } from '../../documents'
 import { IInitialProps } from '../../../interface'
 import styled from 'styled-components'
 
-const Credentials: NextPage<IInitialProps> = ({ user, token }) => {
+const Credentials: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
 
   const styles = {
     card:{
@@ -40,7 +40,8 @@ const Credentials: NextPage<IInitialProps> = ({ user, token }) => {
     setCredentials({
       variables:{
         key,
-        secret
+        secret,
+        bptToken
       }
     })
   }
@@ -52,7 +53,7 @@ const Credentials: NextPage<IInitialProps> = ({ user, token }) => {
           <Typography.Title level={2} style={{ marginBottom: '10px' }}>Credentials</Typography.Title>
         </Divider>
         <Typography.Title level={5} style={{ marginTop:'unset', marginBottom: '1.5em' }}>
-          Hey {user?.name || ''}! Please setup your key
+          Hey {bptUser?.name || ''}! Please setup your key
         </Typography.Title>
         <Form layout="vertical" className="registerForm" requiredMark={'optional'} onFinish={onSubmit}>
           <Form.Item label="API KEY" name="key" rules={[{ required: true, message: 'Please input your key' }]}>
@@ -83,9 +84,9 @@ const Container = styled.div`
 Credentials.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
   const { req, res } = ctx
   const userAgent: string = req ? req.headers["user-agent"] || "" : navigator.userAgent
-  const { user, token }: any = Cookies(ctx)
+  const { bptUser, bptToken }: any = Cookies(ctx)
 
-  if (!user?._id) {
+  if (!bptUser?._id) {
     if (res) {
       res.writeHead(302, {
         Location: "/auth/login",
@@ -95,5 +96,5 @@ Credentials.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
       Router.push({ pathname: "/auth/login" })
     }
   }
-  return { userAgent, user, token }
+  return { userAgent, bptUser, bptToken }
 }

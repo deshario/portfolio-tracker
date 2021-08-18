@@ -1,9 +1,10 @@
 import passport from "passport"
 import User, { IUser } from "./model"
 import { IQuerys, IId, IAuth, IToken, IContext, BKCredentials, ValidCredentials } from "../../../../interface"
-import { refreshToken, signToken, verifyJWT, verifyCredentials } from "../../../auth/auth.service"
+import { refreshToken, signToken, verifyJWT, verifyCredentials, setAuthCookie } from "../../../auth/auth.service"
 import { API_HOST, getReqConstructor } from '../../../config/handler'
 import axios from 'axios';
+import cookieParser from "cookie-parser"
 
 import { setupLocalStrategy } from "../../../auth"
 
@@ -81,7 +82,7 @@ const userController = {
 
   setCredentials: async (payload: any, context:IContext): Promise<BKCredentials> => {
     try {
-      const { key, secret } = payload
+      const { key, secret, token } = payload
       const { valid } = await verifyCredentials({ key, secret })
       if(valid){
         const updatedUser = await User.findOneAndUpdate(
@@ -89,6 +90,12 @@ const userController = {
           { credentials: { key, secret } },
           { new: true }
         )
+
+        if(updatedUser){
+          console.log('Setting Cookie Update')
+          // setAuthCookie(context.res, token, updatedUser.rtoken, updatedUser)
+        }
+
         return {
           success: updatedUser ? true: false,
           email: updatedUser ? updatedUser?.email : '',
