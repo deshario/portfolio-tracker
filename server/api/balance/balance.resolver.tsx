@@ -1,10 +1,10 @@
 import { balanceController } from './db/balance.controller'
-import { TotalBalance } from '../../../interface'
+import { TotalBalance, IContext } from '../../../interface'
 
 const balanceResolver = {
 	Query: {
-		getBalance(parent: any, args: any, context: any): Promise<TotalBalance | any> {
-			return balanceController.getBalance(args);
+		getBalance(parent: any, args: any, context: IContext): Promise<TotalBalance | any> {
+			return balanceController.getBalance(context);
 		},
 	},
 }

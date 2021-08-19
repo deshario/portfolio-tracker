@@ -9,6 +9,7 @@ import { ApolloServer } from 'apollo-server-express'
 import { schema } from './server/config/apollo'
 import { NODE_ENV, HOSTNAME, PORT, JWT_SECRET } from "./server/config/environment"
 import userController from "./server/api/user/db/controller"
+import { verifyCredentials } from "./server/auth/auth.service"
 import crypto from "crypto"
 
 const dev = NODE_ENV !== 'production';
@@ -30,9 +31,11 @@ const handle = nextApp.getRequestHandler();
       const token = req.headers.authorization || ""
       const user = await userController.verifyToken(token)
       if (user && user._id){
-        return { url, user, authorized: true, req, res }
+        const { credentials: {key,secret} } = user;
+        const { valid } = await verifyCredentials({ key, secret })
+        return { user, url, authorized: true, validKey:valid, req, res }
       }
-      return { ...user, url, authorized: false, req, res }
+      return { ...user, url, authorized: false, validKey:false, req, res }
     },
   });
 

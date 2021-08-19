@@ -10,6 +10,8 @@ import styled from 'styled-components'
 
 const Credentials: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
 
+  console.log('Credentials bptUser : ',bptUser)
+
   const styles = {
     card:{
       border: 'unset',
@@ -23,7 +25,7 @@ const Credentials: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
     onCompleted: ({ setCredentials: { success, info }}) => {
       if(success){
         notification.success({ message: info, description: 'Welcome to portfolio tracker' })
-        // Router.push({ pathname: '/' })
+        Router.push({ pathname: '/' })
       }
       if(!success && info){
         notification.error({ message: info, description: 'Please try again with valid credentials' })
@@ -41,7 +43,7 @@ const Credentials: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
       variables:{
         key,
         secret,
-        bptToken
+        token:bptToken
       }
     })
   }
@@ -85,7 +87,6 @@ Credentials.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
   const { req, res } = ctx
   const userAgent: string = req ? req.headers["user-agent"] || "" : navigator.userAgent
   const { bptUser, bptToken }: any = Cookies(ctx)
-
   if (!bptUser?._id) {
     if (res) {
       res.writeHead(302, {

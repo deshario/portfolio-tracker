@@ -1,10 +1,7 @@
 import passport from "passport"
 import User, { IUser } from "./model"
 import { IQuerys, IId, IAuth, IToken, IContext, BKCredentials, ValidCredentials } from "../../../../interface"
-import { refreshToken, signToken, verifyJWT, verifyCredentials, setAuthCookie } from "../../../auth/auth.service"
-import { API_HOST, getReqConstructor } from '../../../config/handler'
-import axios from 'axios';
-import cookieParser from "cookie-parser"
+import { refreshToken, signToken, verifyJWT, verifyCredentials, updateAuthCookie } from "../../../auth/auth.service"
 
 import { setupLocalStrategy } from "../../../auth"
 
@@ -90,17 +87,12 @@ const userController = {
           { credentials: { key, secret } },
           { new: true }
         )
-
         if(updatedUser){
-          console.log('Setting Cookie Update')
-          // setAuthCookie(context.res, token, updatedUser.rtoken, updatedUser)
+          const payload = { updatedUser, token, valid }
+          updateAuthCookie(context.res, payload)
+          return { success: true, info: 'Key Updated', email: updatedUser?.email,  }
         }
-
-        return {
-          success: updatedUser ? true: false,
-          email: updatedUser ? updatedUser?.email : '',
-          info: updatedUser ? 'Key Updated' : ''
-        }
+        return { success: false, info: '', email: '' }
       }else{
         return { success: false, info: 'Invalid Key' };
       }

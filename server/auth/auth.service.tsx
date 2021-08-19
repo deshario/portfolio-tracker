@@ -70,6 +70,25 @@ export const setAuthCookie = (res: express.Response, token: string, rtoken: stri
   return res
 }
 
+export const updateAuthCookie = (res: express.Response, payload: any): express.Response => {
+  const { updatedUser, token, valid } = payload
+  if (updatedUser && token && valid) {
+    const validUser = {
+      _id: updatedUser._id,
+      email: updatedUser.email,
+      name: updatedUser.name,
+      provider: updatedUser.provider,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
+      token: token,
+      rtoken: updatedUser.rtoken,
+      validKey: valid
+    }
+    res.cookie("bptUser", validUser, { maxAge: MAX_AGE })
+  }
+  return res
+}
+
 export const resetAuthCookie = (res: express.Response): express.Response => {
   res.clearCookie("bptToken")
   res.clearCookie("bptRtoken")

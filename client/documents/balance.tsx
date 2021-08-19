@@ -13,8 +13,8 @@ export const BALANCE_FRAG = gql`
 `
 
 export const QUERY_BALANCE = gql`
-  query getBalance($key: String! $secret: String!) {
-    getBalance(key: $key, secret: $secret) {
+  query getBalance {
+    getBalance {
       ...TotalBalance
     }
   }

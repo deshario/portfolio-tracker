@@ -99,6 +99,7 @@ export interface IContext {
   user?: any
   error?: any
   authorized?: boolean
+	validKey?: boolean
   req: express.Request
   res: express.Response
 }

@@ -32,3 +32,12 @@ export const getReqConstructor = async ({ key, secret, payload }) => {
   const headers = createHeader(key);
   return { data, headers }
 }
+
+export const getReqConstructorII = async ({ context, payload }) => {
+  const { credentials : {key,secret} } = context.user;
+  const bPayload = await createPayload(payload)
+  const signatureHash = createSignature(bPayload,secret);
+  const data = { sig:signatureHash, ...bPayload }
+  const headers = createHeader(key);
+  return { data, headers }
+}

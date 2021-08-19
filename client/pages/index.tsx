@@ -2,7 +2,7 @@ import { NextPage } from "next"
 import { Row, Card, List, Avatar, Col } from 'antd';
 import { useEffect, useState } from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
-import { keySecret, avCoins } from '../recoils/atoms'
+import { keySecret, avCoins, credentials } from '../recoils/atoms'
 import { useQuery } from '@apollo/client'
 import PieChart from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
@@ -11,11 +11,15 @@ import { getCoinInfo, getCoinSymbolIcon, thbCurrency } from '../utils'
 import Cookies from "next-cookies"
 import Router from "next/router"
 import { IInitialProps } from '../../interface'
+import { Loader } from '../components/Loader'
 
 const Home: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
 
-  const credentials = useRecoilValue(keySecret);
+  // const credentials = useRecoilValue(keySecret);
   const [availableCoins, setAvailableCoins] = useRecoilState(avCoins);
+  const [isInvalidCreds, setInvalidCreds] = useRecoilState(credentials);
+
+  console.log('isInvalidCreds',isInvalidCreds)
   
   const [balances, setBalances] = useState({
     listData: [],
@@ -23,18 +27,20 @@ const Home: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
     totalValue: '',
   })
 
-  const { data } = useQuery(QUERY_BALANCE, {
-    variables:{
-      key: credentials.btKey,
-      secret: credentials.btSecret
-    },
-    fetchPolicy: "network-only",
-  })
+  const { data, error } = useQuery(QUERY_BALANCE, { fetchPolicy: "network-only" })
 
   useEffect(() => {
+    if(error){
+      if(`${error}`.includes('Invalid key')){
+        console.log('invalid key')
+        setInvalidCreds(true);
+        Router.push({ pathname: "/auth/credentials" })
+      }
+    }
+
     const mData: any = data?.getBalance
     if(mData && mData.success){
-
+      setInvalidCreds(false);
       const netWorth =  mData.balances.reduce((totalPrice:any, eachItem:any) => {
         const available = Number(eachItem.available);
         const value = Number(eachItem.value);
@@ -76,7 +82,7 @@ const Home: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
       })
       
     }
-  }, [data])
+  }, [data,error])
 
   const styles = {
     card: {
@@ -87,7 +93,7 @@ const Home: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
     }
   };
 
-  return (
+  return !isInvalidCreds ? (
     <Row gutter={[8, 16]}>
       <Col>
         <Card hoverable style={styles.card} bodyStyle={styles.cardBody}>
@@ -132,7 +138,7 @@ const Home: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
         />
       </Col>
     </Row>
-  )
+  ) : <Loader/>
 }
 
 Home.getInitialProps = async (ctx: any): Promise<IInitialProps> => {

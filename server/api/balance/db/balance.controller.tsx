@@ -1,13 +1,14 @@
-import { API_HOST, getReqConstructor } from '../../../config/handler'
+import { API_HOST, getReqConstructor, getReqConstructorII } from '../../../config/handler'
 import { tickerController } from '../../ticker/db/ticker.controller'
+import { IContext } from '../../../../interface';
 import axios from 'axios';
 
 const balanceController = {
-  getBalance: async(args:any) => {
+  getBalance: async(context:IContext) => {
     try{
+      if(!context.validKey) throw new Error("Invalid key detected")
       const payload = {}
-      const { key, secret } = args
-      const { data, headers } = await getReqConstructor({ key, secret, payload });
+      const { data, headers } = await getReqConstructorII({ context, payload });
       const mBalances = axios.post(`${API_HOST}/api/market/balances`, data, headers)
       const mTickers = tickerController.getTickers({});
       const [balancesRes, tickersRes] = await Promise.all([mBalances, mTickers]);
@@ -23,7 +24,7 @@ const balanceController = {
       }).filter(transaction => transaction.available > 0)
       return { success: true, balances: cleanedBalances }
     }catch(err){
-      return { success: false, balances: [] }
+      throw err
     }
   }
 }
