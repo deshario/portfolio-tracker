@@ -4,13 +4,11 @@ import Router from "next/router"
 import { Card, Form, Input, Button, Typography, Divider, notification } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useMutation } from '@apollo/client'
-import { SetCredentials } from '../../documents'
+import { SetCredentials, SIGNOUT } from '../../documents'
 import { IInitialProps } from '../../../interface'
 import styled from 'styled-components'
 
 const Credentials: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
-
-  console.log('Credentials bptUser : ',bptUser)
 
   const styles = {
     card:{
@@ -20,6 +18,19 @@ const Credentials: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
       paddingTop:'unset'
     }
   };
+
+  const [signout]: any = useMutation(SIGNOUT,{
+    onCompleted: ({ signout : { _id } }) => {
+      if(_id){
+        notification.success({ message: 'Logout Success' })
+        Router.push({ pathname: '/auth/login' })
+      }
+    },
+    onError: (err) => {
+      console.log('signput',err);
+      notification.error({ message: 'Logout Error', description: 'Please try again' })
+    }
+  })
 
   const [setCredentials] = useMutation(SetCredentials, {
     onCompleted: ({ setCredentials: { success, info }}) => {
@@ -73,6 +84,10 @@ const Credentials: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
           </Form.Item>
         </Form>
       </Card>
+      <p className="signUpLabel">Click
+        <span onClick={() => signout()}><strong> here </strong></span>
+        to signout
+      </p>
     </Container>
   )
 }
@@ -84,18 +99,17 @@ const Container = styled.div`
 `
 
 Credentials.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
-  const { req, res } = ctx
-  const userAgent: string = req ? req.headers["user-agent"] || "" : navigator.userAgent
+  const { res } = ctx
   const { bptUser, bptToken }: any = Cookies(ctx)
-  if (!bptUser?._id) {
+  const redirect = (path:string) => {
     if (res) {
-      res.writeHead(302, {
-        Location: "/auth/login",
-      })
+      res.writeHead(302, { Location: path })
       res.end()
     } else {
-      Router.push({ pathname: "/auth/login" })
+      Router.push({ pathname: path })
     }
   }
-  return { userAgent, bptUser, bptToken }
+  if (!bptUser?._id) redirect("/auth/login")
+  if(bptUser?._id && bptUser?.validKey) redirect("/")
+  return { bptUser, bptToken }
 }

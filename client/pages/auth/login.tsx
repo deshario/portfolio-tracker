@@ -4,9 +4,15 @@ import { Card, Form, Input, Button, Typography, Divider, notification } from 'an
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useMutation } from '@apollo/client'
 import { SIGNIN } from '../../documents'
+import { useRecoilState } from 'recoil';
+import { credentials } from '../../recoils/atoms'
+import { IInitialProps } from '../../../interface'
+import Cookies from "next-cookies"
 import styled from 'styled-components'
 
 const Login = () => {
+
+  const [isValidCreds, setValidCreds] = useRecoilState(credentials);
 
   const styles = {
     card:{
@@ -20,6 +26,7 @@ const Login = () => {
   const [signin] = useMutation(SIGNIN, {
     onCompleted: ({ signin: { name, validKey }}) => {
       notification.success({ message: `Welcome ${name}` })
+      setValidCreds(validKey);
       if(validKey) Router.push({ pathname: '/' })
       if(!validKey){
         setTimeout(() => notification.info({ message: 'Invalid Key', description: 'Please setup your key', duration : 0}), 500)
@@ -78,3 +85,19 @@ export default Login
 const Container = styled.div`
   padding:20px 20px 0 20px;
 `
+
+Login.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
+  const { res } = ctx
+  const { bptUser, bptToken }: any = Cookies(ctx)
+  const redirect = (path:string) => {
+    if (res) {
+      res.writeHead(302, { Location: path })
+      res.end()
+    } else {
+      Router.push({ pathname: path })
+    }
+  }
+  if(bptUser?._id && !bptUser?.validKey) redirect("/auth/credentials")
+  if(bptUser?._id && bptUser?.validKey) redirect("/")
+  return { bptUser, bptToken }
+}

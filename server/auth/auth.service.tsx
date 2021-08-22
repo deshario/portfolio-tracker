@@ -2,7 +2,7 @@ import express from "express"
 import { AuthenticationError } from "apollo-server-express"
 import { IUser } from "../api/user/db/model"
 import { IContext } from "../../interface"
-import { API_HOST, getReqConstructor } from '../config/handler'
+import { API_HOST, getPureReqConstructor } from '../config/handler'
 import { JWT_SECRET } from "../config/environment"
 import crypto from "crypto"
 import jwt from "jsonwebtoken"
@@ -52,7 +52,7 @@ export const refreshToken = (data: IUser): string => {
 export const verifyCredentials = async ({ key, secret }) => {
   try{
     const payload = {}
-    const { data, headers } = await getReqConstructor({ key, secret, payload });
+    const { data, headers } = await getPureReqConstructor({ key, secret, payload });
     const fiatDeposits = await axios.post(`${API_HOST}/api/fiat/deposit-history?lmt=1`, data, headers)
     const isValidConnection = fiatDeposits?.data?.error == 0
     return { valid: isValidConnection };
@@ -70,23 +70,26 @@ export const setAuthCookie = (res: express.Response, token: string, rtoken: stri
   return res
 }
 
-export const updateAuthCookie = (res: express.Response, payload: any): express.Response => {
-  const { updatedUser, token, valid } = payload
-  if (updatedUser && token && valid) {
-    const validUser = {
-      _id: updatedUser._id,
-      email: updatedUser.email,
-      name: updatedUser.name,
-      provider: updatedUser.provider,
-      createdAt: updatedUser.createdAt,
-      updatedAt: updatedUser.updatedAt,
-      token: token,
-      rtoken: updatedUser.rtoken,
-      validKey: valid
-    }
-    res.cookie("bptUser", validUser, { maxAge: MAX_AGE })
+export const rebuildAuthCookie = (context:IContext, isValid:boolean): express.Response => {
+  const getCookie = (cookie,name) => {
+    const parts = cookie.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
   }
-  return res
+  const getUserFromCookie = () => {
+    try{
+      const mCookie = getCookie(context.req.headers.cookie,'bptUser');
+      const bptUserCookie = decodeURIComponent(mCookie).slice(2);
+      return JSON.parse(bptUserCookie);
+    }catch(err){
+      return null;
+    }
+  }
+  const user = getUserFromCookie();
+  if (context.res && user) {
+    user.validKey = isValid
+    context.res.cookie("bptUser", user, { maxAge: MAX_AGE })
+  }
+  return context.res
 }
 
 export const resetAuthCookie = (res: express.Response): express.Response => {

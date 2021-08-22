@@ -87,3 +87,8 @@ export const thbCurrency = (amount:number|string) => {
   let amountNum =  typeof amount == 'string' ? Number(amount) : amount
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amountNum).replace('$','฿')
 }
+
+export const isInvalidKey = (error:any, callback:Function) => {
+  const isInvalid = `${error}`.includes('Invalid key');
+  callback(isInvalid);
+}

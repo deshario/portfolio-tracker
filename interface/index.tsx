@@ -120,7 +120,6 @@ export interface ValidCredentials {
 }
 
 export interface IInitialProps {
-  userAgent?: string
   bptUser?: any
   bptToken?: any,
   form?: any

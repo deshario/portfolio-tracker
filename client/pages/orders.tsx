@@ -1,10 +1,22 @@
 import { Card, Table, Tabs } from 'antd';
-import { useRecoilValue } from 'recoil';
 import { avCoins } from '../recoils/atoms'
+import { NextPage } from "next"
+import { useRecoilValue, useRecoilState } from 'recoil';
+import { credentials } from '../recoils/atoms'
+import { Loader } from '../components/Loader'
+import { IInitialProps } from '../../interface'
+import Cookies from "next-cookies"
+import Router from "next/router"
 
 const { TabPane } = Tabs;
 
-const Orders = () => {
+const Orders: NextPage<IInitialProps> = () => {
+
+  // const [isValidKey, setValidKey] = useRecoilState(credentials);
+  const isValidKey = useRecoilValue(credentials);
+
+  console.log('Orders ',isValidKey);
+
   const coins = useRecoilValue(avCoins);
 
   const styles = {
@@ -24,7 +36,7 @@ const Orders = () => {
     }
   ];
 
-  return (
+  return isValidKey ? (
     <div>
       <Card title="Orders" bodyStyle={styles.cardBody}>
         <Tabs defaultActiveKey={coins[0]} onChange={onOrderTabChange}>
@@ -67,7 +79,27 @@ const Orders = () => {
       </Tabs>
       </Card>
     </div>
-  )
+  ) : <Loader/>
+}
+
+Orders.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
+  const { req, res } = ctx
+  const { bptUser, bptToken }: any = Cookies(ctx)
+  const redirect = (path:string) => {
+    if (res) {
+      res.writeHead(302, { Location: path })
+      res.end()
+    } else {
+      Router.push({ pathname: path })
+    }
+  }
+  if (!bptUser?._id){
+    redirect("/auth/login")
+  }
+  if(bptUser?._id && !bptUser?.validKey){
+    redirect("/auth/credentials")
+  }
+  return { bptUser, bptToken }
 }
 
 export default Orders

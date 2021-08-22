@@ -13,6 +13,8 @@ const App = ({ Component, pageProps }: AppProps) => {
     <>
       <Head>
         <title>Portfolio Tracker</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <ApolloProvider client={apolloClient}>
         <RecoilRoot>

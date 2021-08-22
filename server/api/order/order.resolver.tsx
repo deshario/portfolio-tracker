@@ -1,10 +1,10 @@
 import { orderController } from './db/order.controller'
-import { Order } from '../../../interface'
+import { Order, IContext } from '../../../interface'
 
 const orderResolver = {
 	Query: {
-		getMyOrderHistory (parent: any, args: any, context: any): Promise<Order | any> {
-			return orderController.getMyOrderHistory(args);
+		getMyOrderHistory (parent: any, args: any, context: IContext): Promise<Order | any> {
+			return orderController.getMyOrderHistory(args,context);
 		}
 	},
 }

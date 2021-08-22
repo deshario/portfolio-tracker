@@ -3,7 +3,7 @@ import { Ticker } from '../../../../interface'
 import axios from 'axios';
 
 const tickerController = {
-  getTickers: async(args:any) => {
+  getTickers: async() => {
     try{
       const { data: result } = await axios.get(`${API_HOST}/api/market/ticker`)
       const tickers:Ticker[] = Object.keys(result).map(key => {

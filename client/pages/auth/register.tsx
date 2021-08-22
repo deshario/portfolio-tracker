@@ -4,6 +4,8 @@ import { Card, Form, Input, Button, Typography, Divider, notification } from 'an
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useMutation } from '@apollo/client'
 import { SIGNUP } from '../../documents'
+import { IInitialProps } from '../../../interface'
+import Cookies from "next-cookies"
 import styled from 'styled-components'
 import mongoose from "mongoose"
 
@@ -124,3 +126,19 @@ export default Register
 const Container = styled.div`
   padding:20px 20px 0 20px;
 `
+
+Register.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
+  const { res } = ctx
+  const { bptUser, bptToken }: any = Cookies(ctx)
+  const redirect = (path:string) => {
+    if (res) {
+      res.writeHead(302, { Location: path })
+      res.end()
+    } else {
+      Router.push({ pathname: path })
+    }
+  }
+  if(bptUser?._id && !bptUser?.validKey) redirect("/auth/credentials")
+  if(bptUser?._id && bptUser?.validKey) redirect("/")
+  return { bptUser, bptToken }
+}

@@ -1,34 +1,41 @@
 import React, { useEffect, useState } from 'react';
+import { NextPage } from "next"
 import { useQuery } from '@apollo/client'
-import { useRecoilValue } from 'recoil';
-import { keySecret } from '../recoils/atoms/keySecret'
 import { QUERY_ALL_DEPOSIT } from '../documents'
 import { Row, Card, Tag, Col, Timeline, List, Avatar } from 'antd';
 import { CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 import { getCoinInfo, getCoinSymbolIcon, thbCurrency } from '../utils'
+import Router from "next/router"
+import { useRecoilValue, useRecoilState } from 'recoil';
+import { credentials } from '../recoils/atoms'
+import Cookies from "next-cookies"
+import { IInitialProps } from '../../interface'
+import { Loader } from '../components/Loader'
 import moment from 'moment'
 
-const Deposits = () => {
+const Deposits: NextPage<IInitialProps> = () => {
 
-  const credentials = useRecoilValue(keySecret);
+  const [isInvalidCreds, setInvalidCreds] = useRecoilState(credentials);
+
   const [deposits, setDeposits] = useState({
     fiat:[],
     crypto: []
   })
-  const { data } = useQuery(QUERY_ALL_DEPOSIT, {
-    variables:{
-      key: credentials.btKey,
-      secret: credentials.btSecret
-    },
-    fetchPolicy: "network-only",
-  })
+  const { data, error } = useQuery(QUERY_ALL_DEPOSIT, { fetchPolicy: "network-only" })
 
   useEffect(() => {
+    if(error){
+      if(`${error}`.includes('Invalid key')){
+        setInvalidCreds(true);
+        Router.push({ pathname: "/auth/credentials" })
+      }
+    }
     if(data && data.getAllDeposit){
+      setInvalidCreds(false);
       const { fiat, crypto } = data.getAllDeposit
       setDeposits({ fiat, crypto })
     }
-  },[data]);
+  },[data,error]);
 
   type Status = { status: string; }
   
@@ -55,7 +62,7 @@ const Deposits = () => {
     }
   };
 
-  return (
+  return !isInvalidCreds ? (
     <div>
       <Row gutter={[8, 16]}>
         <Col span={10}>
@@ -109,7 +116,27 @@ const Deposits = () => {
         </Col>
       </Row>
     </div>
-  )
+  ) : <Loader />
 } 
+
+Deposits.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
+  const { res } = ctx
+  const { bptUser, bptToken }: any = Cookies(ctx)
+  const redirect = (path:string) => {
+    if (res) {
+      res.writeHead(302, { Location: path })
+      res.end()
+    } else {
+      Router.push({ pathname: path })
+    }
+  }
+  if (!bptUser?._id){
+    redirect("/auth/login")
+  }
+  if(bptUser?._id && !bptUser?.validKey){
+    redirect("/auth/credentials")
+  }
+  return { bptUser, bptToken }
+}
 
 export default Deposits

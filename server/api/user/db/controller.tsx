@@ -1,7 +1,7 @@
 import passport from "passport"
 import User, { IUser } from "./model"
 import { IQuerys, IId, IAuth, IToken, IContext, BKCredentials, ValidCredentials } from "../../../../interface"
-import { refreshToken, signToken, verifyJWT, verifyCredentials, updateAuthCookie } from "../../../auth/auth.service"
+import { refreshToken, signToken, verifyJWT, verifyCredentials, rebuildAuthCookie } from "../../../auth/auth.service"
 
 import { setupLocalStrategy } from "../../../auth"
 
@@ -88,8 +88,7 @@ const userController = {
           { new: true }
         )
         if(updatedUser){
-          const payload = { updatedUser, token, valid }
-          updateAuthCookie(context.res, payload)
+          rebuildAuthCookie(context, true)
           return { success: true, info: 'Key Updated', email: updatedUser?.email,  }
         }
         return { success: false, info: '', email: '' }

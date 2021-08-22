@@ -36,8 +36,8 @@ export const ALL_DEPOSIT = gql`
 `
 
 export const QUERY_FIAT_DEPOSIT = gql`
-  query getFiatDeposit($key: String! $secret: String!) {
-    getFiatDeposit(key: $key, secret: $secret) {
+  query getFiatDeposit {
+    getFiatDeposit{
       ...FiatDeposit
     }
   }
@@ -45,8 +45,8 @@ export const QUERY_FIAT_DEPOSIT = gql`
 `
 
 export const QUERY_ALL_DEPOSIT = gql`
-  query getAllDeposit($key: String! $secret: String!) {
-    getAllDeposit(key: $key, secret: $secret) {
+  query getAllDeposit{
+    getAllDeposit{
       ...AllDeposit
     }
   }

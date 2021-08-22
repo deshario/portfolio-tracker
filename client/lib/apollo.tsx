@@ -20,7 +20,7 @@ const createApolloClient = () => {
 
   const httpLink = new HttpLink({
     uri: "/playground",
-    credentials: 'same-origin',
+    credentials: 'same-origin'
   })
 
   const authLink = new ApolloLink((operation, forward): any => {
@@ -33,6 +33,7 @@ const createApolloClient = () => {
     ssrMode: typeof window === "undefined",
     link : ApolloLink.from([authLink, httpLink]),
     cache: new InMemoryCache(),
+    connectToDevTools: process.env.NODE_ENV === 'development'
   });
 
 }

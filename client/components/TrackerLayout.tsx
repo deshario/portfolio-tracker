@@ -8,7 +8,7 @@ import { useMutation } from '@apollo/client'
 
 const { Header, Content, Sider } = Layout;
 
-const TrackerLayout: React.FC<{ bptUser: any }> = (props) => {
+const TrackerLayout = (props:any) => {
 
   const [signout]: any = useMutation(SIGNOUT,{
     onCompleted: ({ signout : { _id } }) => {

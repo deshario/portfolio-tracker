@@ -25,7 +25,7 @@ export const createHeader = (key:string) => {
   }
 }
 
-export const getReqConstructor = async ({ key, secret, payload }) => {
+export const getPureReqConstructor = async ({ key, secret, payload }) => {
   const bPayload = await createPayload(payload)
   const signatureHash = createSignature(bPayload,secret);
   const data = { sig:signatureHash, ...bPayload }
@@ -33,11 +33,7 @@ export const getReqConstructor = async ({ key, secret, payload }) => {
   return { data, headers }
 }
 
-export const getReqConstructorII = async ({ context, payload }) => {
+export const getReqConstructor = async ({ context, payload }) => {
   const { credentials : {key,secret} } = context.user;
-  const bPayload = await createPayload(payload)
-  const signatureHash = createSignature(bPayload,secret);
-  const data = { sig:signatureHash, ...bPayload }
-  const headers = createHeader(key);
-  return { data, headers }
+  return getPureReqConstructor({ key, secret, payload })
 }
