@@ -66,7 +66,7 @@ const Credentials: NextPage<IInitialProps> = ({ bptUser, bptToken }) => {
           <Typography.Title level={2} style={{ marginBottom: '10px' }}>Credentials</Typography.Title>
         </Divider>
         <Typography.Title level={5} style={{ marginTop:'unset', marginBottom: '1.5em' }}>
-          Hey {bptUser?.name || ''}! Please setup your key
+          Hey {bptUser?.name || ''}! Please setup your <a href="https://www.bitkub.com/publicapi" target="_blank">key</a>
         </Typography.Title>
         <Form layout="vertical" className="registerForm" requiredMark={'optional'} onFinish={onSubmit}>
           <Form.Item label="API KEY" name="key" rules={[{ required: true, message: 'Please input your key' }]}>
