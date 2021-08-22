@@ -19,6 +19,10 @@ const orderType = gql`
 		data: [MOrder]
 	}
 
+	type AvailableOrders {
+		symbol: String
+	}
+
 `;
 
 export { orderType }
