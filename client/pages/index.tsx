@@ -2,7 +2,7 @@ import { NextPage } from "next"
 import { Row, Card, List, Avatar, Col, notification } from 'antd';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { credentials } from '../recoils/atoms'
+import { credentials, overview } from '../recoils/atoms'
 import { useQuery } from '@apollo/client'
 import { QUERY_BALANCE } from '../documents'
 import { getCoinInfo, getCoinSymbolIcon, thbCurrency, isInvalidKey } from '../utils'
@@ -16,6 +16,7 @@ import PieChart from "highcharts-react-official";
 const Home: NextPage<IInitialProps> = ({ bptUser }) => {
 
   const [isValidKey, setValidKey] = useRecoilState(credentials);
+  const [overViewData, setOverViewData] = useRecoilState(overview);
 
   const [balances, setBalances] = useState({
     listData: [],
@@ -61,6 +62,7 @@ const Home: NextPage<IInitialProps> = ({ bptUser }) => {
         pieData: chartData,
         totalValue: Number(netWorth).toFixed(2)
       })
+      setOverViewData({ ...overViewData, netWorth })
     }
     if(error){
       isInvalidKey(error, (isInvalid:boolean) => {

@@ -2,23 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { NextPage } from "next"
 import { useQuery } from '@apollo/client'
 import { QUERY_ALL_DEPOSIT } from '../documents'
-import { Row, Card, Tag, Col, Timeline, List, Avatar, notification } from 'antd';
+import { Row, Card, Tag, Col, Timeline, List, Avatar, Tooltip, notification } from 'antd';
 import { CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 import { getCoinInfo, getCoinSymbolIcon, thbCurrency, isInvalidKey } from '../utils'
-import Router from "next/router"
-import { useRecoilValue, useRecoilState } from 'recoil';
-import { credentials } from '../recoils/atoms'
-import Cookies from "next-cookies"
+import { useRecoilState } from 'recoil';
+import { credentials, overview } from '../recoils/atoms'
 import { IInitialProps } from '../../interface'
 import { Loader } from '../components/Loader'
+import Cookies from "next-cookies"
+import Router from "next/router"
 import moment from 'moment'
 
 const Deposits: NextPage<IInitialProps> = () => {
 
   const [isValidKey, setValidKey] = useRecoilState(credentials);
+  const [overViewData, setOverViewData] = useRecoilState(overview);
 
   const [deposits, setDeposits] = useState({
     fiat:[],
+    fiatTotal:0,
     crypto: []
   })
   const { data, error } = useQuery(QUERY_ALL_DEPOSIT, { fetchPolicy: "network-only" })
@@ -27,7 +29,14 @@ const Deposits: NextPage<IInitialProps> = () => {
     if(data && data.getAllDeposit){
       setValidKey(true);
       const { fiat, crypto } = data.getAllDeposit
-      setDeposits({ fiat, crypto })
+      const totalFiatDeposit = fiat.reduce((total:any, eachDep:any) => {
+        if(eachDep.status == 'complete'){
+          total = total+eachDep.amount;
+        }
+        return total;
+      },0)
+      setDeposits({ fiat, fiatTotal:totalFiatDeposit, crypto })
+      setOverViewData({ ...overViewData, totalFiatDeposit })
     }
     if(error){
       isInvalidKey(error, (isInvalid:boolean) => {
@@ -69,7 +78,14 @@ const Deposits: NextPage<IInitialProps> = () => {
     <div>
       <Row gutter={[8, 16]}>
         <Col span={10}>
-          <Card hoverable title="Fiat Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}>
+          <Card hoverable title="Fiat Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}
+            extra={
+              <strong style={{ color:'green'}}>
+                <Tooltip placement="topLeft" title={overViewData?.netWorth ? `Real Value : ${thbCurrency(overViewData?.netWorth)}` : ''}>
+                  {thbCurrency(deposits.fiatTotal)}
+                </Tooltip>
+              </strong>
+            }>
             <Timeline>
               {
                 deposits.fiat.map((item:any, index:number) => {
