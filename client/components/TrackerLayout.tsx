@@ -40,9 +40,6 @@ const TrackerLayout = (props:any) => {
           <Menu.Item key="withdrawls" icon={<CloudDownloadOutlined />}>
             <Link href="/withdrawls">WithDrawls</Link>
           </Menu.Item>
-          <Menu.Item key="connection" icon={<ApiOutlined />}>
-            <Link href="/connection">Connection</Link>
-          </Menu.Item>
           <Menu.Item key="logout" icon={<LogoutOutlined />}>
             <span onClick={() => signout()}>Logout</span>
           </Menu.Item>
@@ -51,7 +48,7 @@ const TrackerLayout = (props:any) => {
       <Layout className="content-light">
         <Header className="header-light" />
         <Content>
-          <div className="site-layout-background" style={{ padding: 24 }}>
+          <div className="site-layout-background" style={{ padding: 24, height:'100%' }}>
             { props.children }
           </div>
         </Content>

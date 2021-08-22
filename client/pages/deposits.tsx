@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { NextPage } from "next"
 import { useQuery } from '@apollo/client'
 import { QUERY_ALL_DEPOSIT } from '../documents'
-import { Row, Card, Tag, Col, Timeline, List, Avatar } from 'antd';
+import { Row, Card, Tag, Col, Timeline, List, Avatar, notification } from 'antd';
 import { CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { getCoinInfo, getCoinSymbolIcon, thbCurrency } from '../utils'
+import { getCoinInfo, getCoinSymbolIcon, thbCurrency, isInvalidKey } from '../utils'
 import Router from "next/router"
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { credentials } from '../recoils/atoms'
@@ -15,7 +15,7 @@ import moment from 'moment'
 
 const Deposits: NextPage<IInitialProps> = () => {
 
-  const [isInvalidCreds, setInvalidCreds] = useRecoilState(credentials);
+  const [isValidKey, setValidKey] = useRecoilState(credentials);
 
   const [deposits, setDeposits] = useState({
     fiat:[],
@@ -24,17 +24,19 @@ const Deposits: NextPage<IInitialProps> = () => {
   const { data, error } = useQuery(QUERY_ALL_DEPOSIT, { fetchPolicy: "network-only" })
 
   useEffect(() => {
-    if(error){
-      if(`${error}`.includes('Invalid key')){
-        setInvalidCreds(true);
-        Router.push({ pathname: "/auth/credentials" })
-      }
-    }
     if(data && data.getAllDeposit){
-      setInvalidCreds(false);
+      setValidKey(true);
       const { fiat, crypto } = data.getAllDeposit
       setDeposits({ fiat, crypto })
     }
+    if(error){
+      isInvalidKey(error, (isInvalid:boolean) => {
+       if(isInvalid){
+         notification.warn({ message: 'Invalid key detected', description:'Please setup your key' })
+         Router.push({ pathname: "/auth/credentials" })
+       }
+     })
+   }
   },[data,error]);
 
   type Status = { status: string; }
@@ -62,7 +64,7 @@ const Deposits: NextPage<IInitialProps> = () => {
     }
   };
 
-  return !isInvalidCreds ? (
+  return isValidKey ? (
     <div>
       <Row gutter={[8, 16]}>
         <Col span={10}>

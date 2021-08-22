@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { credentials } from '../recoils/atoms'
 import { useQuery } from '@apollo/client'
-import PieChart from "highcharts-react-official";
-import Highcharts from "highcharts/highstock";
 import { QUERY_BALANCE } from '../documents'
 import { getCoinInfo, getCoinSymbolIcon, thbCurrency, isInvalidKey } from '../utils'
-import Cookies from "next-cookies"
-import Router from "next/router"
 import { IInitialProps } from '../../interface'
 import { Loader } from '../components/Loader'
+import Cookies from "next-cookies"
+import Router from "next/router"
+import Highcharts from "highcharts/highstock";
+import PieChart from "highcharts-react-official";
 
 const Home: NextPage<IInitialProps> = ({ bptUser }) => {
 
@@ -66,7 +66,7 @@ const Home: NextPage<IInitialProps> = ({ bptUser }) => {
       isInvalidKey(error, (isInvalid:boolean) => {
         if(isInvalid){
           notification.warn({ message: 'Invalid key detected', description:'Please setup your key' })
-          Router.reload();
+          Router.push({ pathname: "/auth/credentials" })
         }
       })
     }
