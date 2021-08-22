@@ -5,14 +5,19 @@ import { Layout, Menu, notification } from 'antd';
 import { CloudDownloadOutlined, WalletOutlined, CloudUploadOutlined, ApiOutlined, FileProtectOutlined, LogoutOutlined } from '@ant-design/icons';
 import { SIGNOUT } from '../documents'
 import { useMutation } from '@apollo/client'
+import { useRecoilState } from 'recoil';
+import { credentials } from '../recoils/atoms'
 
 const { Header, Content, Sider } = Layout;
 
 const TrackerLayout = (props:any) => {
 
+  const [isValidKey, setValidKey] = useRecoilState(credentials);
+
   const [signout]: any = useMutation(SIGNOUT,{
     onCompleted: ({ signout : { _id } }) => {
       if(_id){
+        setValidKey(false);
         notification.success({ message: 'Logout Success' })
         Router.push({ pathname: '/auth/login' })
       }

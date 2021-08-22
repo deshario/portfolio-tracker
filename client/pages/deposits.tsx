@@ -32,6 +32,7 @@ const Deposits: NextPage<IInitialProps> = () => {
     if(error){
       isInvalidKey(error, (isInvalid:boolean) => {
        if(isInvalid){
+         setValidKey(false);
          notification.warn({ message: 'Invalid key detected', description:'Please setup your key' })
          Router.push({ pathname: "/auth/credentials" })
        }
