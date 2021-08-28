@@ -34,5 +34,5 @@ export const keySecret = atom({
     btKey : '',
     btSecret : ''
   },
-  effects_UNSTABLE: [persistAtom],
+  // effects_UNSTABLE: [persistAtom],
 })

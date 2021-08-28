@@ -17,8 +17,8 @@ export interface IUser extends Document {
   ftoken: string
   profile:any
   payload4Sign: any
-  updatedAt: any
   createdAt: any
+  updatedAt: any
   authenticate: (password: any, callback?: (err: any, status?: boolean) => boolean) => any
   encryptPassword: (password: string, callback?: (err: any, pwdGen: string) => boolean) => any
 }

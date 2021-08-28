@@ -9,7 +9,7 @@ export const overview = atom({
     netWorth: 0,
     totalFiatDeposit: 0
   },
-  effects_UNSTABLE: [
-    persistAtom
-  ],
+  // effects_UNSTABLE: [
+  //   persistAtom
+  // ],
 })

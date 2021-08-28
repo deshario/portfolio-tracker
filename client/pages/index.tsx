@@ -24,6 +24,8 @@ const Home: NextPage<IInitialProps> = ({ bptUser }) => {
     totalValue: '',
   })
 
+  //useSetRecoilState
+
   const { data, error } = useQuery(QUERY_BALANCE, { fetchPolicy: "network-only" })
 
   useEffect(() => {
