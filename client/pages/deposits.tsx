@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { NextPage } from "next"
 import { useQuery } from '@apollo/client'
 import { QUERY_ALL_DEPOSIT } from '../documents'
-import { Row, Card, Tag, Col, Timeline, List, Avatar, Tooltip, notification } from 'antd';
-import { CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
-import { getCoinInfo, getCoinSymbolIcon, thbCurrency, isInvalidKey } from '../utils'
+import { Row, Card, Tag, Col, List, Avatar, Tooltip, notification, Empty } from 'antd';
+import { getCoinInfo, getCoinSymbolIcon, thbCurrency, isInvalidKey, formatCash } from '../utils'
 import { useRecoilState } from 'recoil';
 import { credentials, overview } from '../recoils/atoms'
 import { IInitialProps } from '../../interface'
@@ -12,30 +11,49 @@ import { Loader } from '../components/Loader'
 import Cookies from "next-cookies"
 import Router from "next/router"
 import moment from 'moment'
+import styled from 'styled-components'
+import Highcharts from "highcharts/highstock";
+import HighchartsReact from "highcharts-react-official";
 
 const Deposits: NextPage<IInitialProps> = () => {
 
   const [isValidKey, setValidKey] = useRecoilState(credentials);
   const [overViewData, setOverViewData] = useRecoilState(overview);
-
   const [deposits, setDeposits] = useState({
     fiat:[],
     fiatTotal:0,
     crypto: []
   })
+  
   const { data, error } = useQuery(QUERY_ALL_DEPOSIT, { fetchPolicy: "network-only" })
 
   useEffect(() => {
     if(data && data.getAllDeposit){
       setValidKey(true);
       const { fiat, crypto } = data.getAllDeposit
-      const totalFiatDeposit = fiat.reduce((total:any, eachDep:any) => {
-        if(eachDep.status == 'complete'){
-          total = total+eachDep.amount;
+      const groupedFiat = fiat.reduce((grouped:any, eachItem:any) => {
+        if(eachItem.status === "complete"){
+          let date = moment.unix(eachItem.time).format('MMM YYYY');
+          const isExist = grouped.find((eI:any) => eI.date === date);
+          if(isExist){
+            isExist['deposits'].push(eachItem)
+          }else{
+            grouped.push({ date: date, deposits:[eachItem] });
+          }
         }
-        return total;
-      },0)
-      setDeposits({ fiat, fiatTotal:totalFiatDeposit, crypto })
+        return grouped;
+      },[]).map((eachMonth:any) => {
+        const total = eachMonth.deposits.reduce((total:Number, eachDep:any) => total+eachDep.amount,0);
+        return {
+          name: eachMonth.date,
+          key: eachMonth.date,
+          y: total,
+          profit: 20
+          // color: '#66BB6A'
+        }
+      }).reverse();
+      const totalFiatDeposit = groupedFiat.reduce((total:Number, eachItem:any) => total+eachItem.y, 0)
+      setDeposits({ fiat:groupedFiat, fiatTotal:totalFiatDeposit, crypto })
       setOverViewData({ ...overViewData, totalFiatDeposit })
     }
     if(error){
@@ -49,20 +67,12 @@ const Deposits: NextPage<IInitialProps> = () => {
    }
   },[data,error]);
 
-  type Status = { status: string; }
-  
-  const ItemDot = ({ status }: Status) => {
-    if(status == "complete"){
-      return <CheckCircleOutlined style={{ fontSize: '16px' }} />
-    }
-    return <StopOutlined style={{ fontSize: '16px' }} />
-  }
-
   const itemColor = (status:string) => status == "complete" ? 'green' : 'red'
 
   const styles = {
     card: {
-      maxHeight: '100%'
+      maxHeight: '100%',
+      // width:'100%'
     },
     cardBody: {
       maxHeight: 530,
@@ -74,43 +84,81 @@ const Deposits: NextPage<IInitialProps> = () => {
     }
   };
 
+  const DepositChart = () => {
+    return deposits?.fiat?.length > 0 ? (
+      <div style={{ width:'100%'}}>
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={{
+            chart: {
+              type: 'column'
+            },
+            credits: {
+              enabled: false
+            },
+            title: {
+              text: ''
+            },
+            xAxis: {
+              type: 'category',
+              labels: {
+                rotation: -45,
+                style: {
+                  fontSize: '10px',
+                  fontWeight: 'bold',
+                  fontFamily: 'Verdana, sans-serif'
+                }
+              }
+            },
+            yAxis: {
+              min: 0,
+              title: {
+                text: 'Amount'
+              }
+            },
+            legend: {
+              enabled: false
+            },
+            tooltip: {
+              formatter: function(){
+                // const activeKey = curElem?.points[0]?.key;
+                // if(activeKey){
+                //   const targetDep:any = deposits.fiatChart.find((e:any) => e.key == activeKey)
+                //   if(targetDep?.profit){
+                //     console.log('targetDep ----',targetDep?.profit)
+                //   }
+                // }
+                let curElem:any = this;
+                return `${formatCash(curElem.y)}`;
+              }
+            },
+            series: [{
+              name: 'Fiat',
+              data: deposits.fiat,
+              color: '#66BB6A',
+            }]
+          }}
+        />
+      </div>
+    ) : (<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />)
+  }
+
   return isValidKey ? (
     <div>
       <Row gutter={[8, 16]}>
-        <Col span={10}>
-          <Card hoverable title="Fiat Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}
+        <Col span={16}>
+          <FiatCard hoverable title="Fiat Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}
             extra={
               <strong style={{ color:'green'}}>
                 <Tooltip placement="topLeft" title={overViewData?.netWorth ? `Real Value : ${thbCurrency(overViewData?.netWorth)}` : ''}>
-                  {thbCurrency(deposits.fiatTotal)}
+                  <Tag color='green'>{thbCurrency(deposits.fiatTotal)}</Tag>
                 </Tooltip>
               </strong>
             }>
-            <Timeline>
-              {
-                deposits.fiat.map((item:any, index:number) => {
-                  return (
-                    <Timeline.Item
-                      key={index}
-                      dot={<ItemDot status={item.status}/>}
-                      color={itemColor(item.status)}>
-                        <span style={{ color:itemColor(item.status) }}>
-                          {thbCurrency(item.amount)} at 
-                          <Tag color='blue' style={{ marginLeft:'10px'}}>
-                            {moment.unix(item.time).format("MMMM Do YYYY, HH:mm")}
-                          </Tag>
-                          <Tag color={itemColor(item.status)} style={{ marginLeft:'10px', float:'right'}}>
-                            {item.status}
-                          </Tag>
-                        </span>
-                    </Timeline.Item>
-                  )
-                })
-              }
-            </Timeline>
-          </Card>
+            <DepositChart />
+          </FiatCard>
         </Col>
-        <Col span={14}>
+        <Col span={8}>
           <Card hoverable title="Crypto Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}>
             <List
               dataSource={deposits.crypto}
@@ -159,3 +207,12 @@ Deposits.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
 }
 
 export default Deposits
+
+export const FiatCard = styled(Card)`
+  > .ant-card-head{
+    padding-right:5px;
+  }
+  > .ant-card-head .ant-card-extra{
+    padding:unset;
+  }
+`
