@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Router from 'next/router'
-import { Layout, Menu, notification } from 'antd';
+import { Layout, Menu, Avatar, Divider, notification } from 'antd';
 import { CloudDownloadOutlined, CloudUploadOutlined, PieChartOutlined, FileProtectOutlined, LogoutOutlined } from '@ant-design/icons';
 import { SIGNOUT } from '../documents'
 import { useMutation } from '@apollo/client'
@@ -28,10 +28,22 @@ const TrackerLayout = (props:any) => {
     }
   })
 
+  const getUserAlias = () => {
+    const { bptUser } = props;
+    const alias = `${bptUser?.name[0]}${bptUser?.name[bptUser?.name.length-1]}`
+    return alias.toUpperCase();
+  }
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider theme="light">
-        <div style={{ height: '32px', background: '#616161', margin: '16px' }} />
+        <div style={{ margin: '15px 20px 0 20px', cursor:'pointer' }}>
+          <Avatar style={{ backgroundColor: '#f56a00', verticalAlign: 'middle' }} size="large">
+            {getUserAlias()}
+          </Avatar>
+          <span style={{ marginLeft:5 }}> {props?.bptUser?.name}</span>
+        </div>
+        <Divider style={{ margin:'15px 0'}}/>
         <Menu theme="light" defaultSelectedKeys={['1']} mode="inline">
           <Menu.Item key="overview" icon={<PieChartOutlined />}>
             <Link href="/">Overview</Link>
