@@ -6,11 +6,16 @@ const balanceType = gql`
 		available: String
 		reserved: String
 		symbol: String
-		value: String
+		marketPrice: String
+		marketValue: String
+		totalBought: String
+    profitPercent: String
+		holdingPercent: String
 	}
 
   type TotalBalance {
 		success: Boolean
+		netWorth: String
 		balances: [Balance]
 	}
 	

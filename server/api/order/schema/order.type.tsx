@@ -16,6 +16,7 @@ const orderType = gql`
 
 	type Orders {
 		success: Boolean
+		totalBought: String
 		data: [MOrder]
 	}
 

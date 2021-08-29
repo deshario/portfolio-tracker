@@ -14,7 +14,8 @@ const orderController = {
       const payload = { sym }
       const { data, headers } = await getReqConstructor({ context, payload });
       const { data: { result : symbolData } } = await axios.post(`${API_HOST}/api/market/my-order-history`, data, headers)
-      return { success: true, data: symbolData || [] }
+      const totalBought = symbolData && symbolData.reduce((total,item) => total+(Number(item.amount)*Number(item.rate)),0) || 0;
+      return { success: true, totalBought, data: symbolData || [] }
     }catch(err){
       throw err
     }

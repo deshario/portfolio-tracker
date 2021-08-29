@@ -3,11 +3,16 @@ import { gql } from '@apollo/client'
 export const BALANCE_FRAG = gql`
   fragment TotalBalance on TotalBalance {
     success
+    netWorth
     balances{
       symbol
       available
       reserved
-      value
+      totalBought
+      marketPrice
+      marketValue
+      profitPercent
+      holdingPercent
     }
   }
 `

@@ -1,11 +1,11 @@
 import { NextPage } from "next"
-import { Row, Card, List, Avatar, Col, notification } from 'antd';
+import { Row, Card, List, Avatar, Col, Tooltip, Tag, Progress, notification } from 'antd';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { credentials, overview } from '../recoils/atoms'
 import { useQuery } from '@apollo/client'
 import { QUERY_BALANCE } from '../documents'
-import { getCoinInfo, getCoinSymbolIcon, thbCurrency, isInvalidKey } from '../utils'
+import { getCoinInfo, getCoinSymbolIcon, thbCurrency, isInvalidKey, formatCash } from '../utils'
 import { IInitialProps } from '../../interface'
 import { Loader } from '../components/Loader'
 import Cookies from "next-cookies"
@@ -17,53 +17,16 @@ const Home: NextPage<IInitialProps> = ({ bptUser }) => {
 
   const [isValidKey, setValidKey] = useRecoilState(credentials);
   const [overViewData, setOverViewData] = useRecoilState(overview);
-
-  const [balances, setBalances] = useState({
-    listData: [],
-    pieData: [],
-    totalValue: '',
-  })
-
-  //useSetRecoilState
+  const [balances, setBalances] = useState({ netWorth: '', listData: [] })
 
   const { data, error } = useQuery(QUERY_BALANCE, { fetchPolicy: "network-only" })
 
   useEffect(() => {
     const mData: any = data?.getBalance
     if(mData && mData.success){
+      const { netWorth, balances:payload } = mData;
       setValidKey(true);
-      const netWorth =  mData.balances.reduce((totalPrice:any, eachItem:any) => {
-        const available = Number(eachItem.available);
-        const value = Number(eachItem.value);
-        const thVal = eachItem.symbol == "THB" ? available*1 : available*value;
-        totalPrice = totalPrice+(thVal)
-        return totalPrice;
-      },0);
-      const totalBalances =  mData.balances.map((eachItem:any) => {
-        const available = Number(eachItem.available);
-        const value = Number(eachItem.value);
-        const totalValue = eachItem.symbol == "THB" ? available*1 : available*value
-        const percent = (totalValue / Number(netWorth)) * 100;
-        return {
-          ...eachItem,
-          realValue: Number(totalValue).toFixed(2),
-          percent:Number(percent).toFixed(2)
-        }
-      });
-      const chartData = mData.balances.map((eachItem:any) => {
-        const available = Number(eachItem.available);
-        const value = Number(eachItem.value);
-        const totalValue = Number(available*value).toFixed(2)
-        return {
-          name: eachItem.symbol,
-          y: Number(totalValue)
-        }
-      });
-      setBalances({
-        listData: totalBalances,
-        pieData: chartData,
-        totalValue: Number(netWorth).toFixed(2)
-      })
+      setBalances({ listData: payload, netWorth })
       setOverViewData({ ...overViewData, netWorth })
     }
     if(error){
@@ -79,56 +42,101 @@ const Home: NextPage<IInitialProps> = ({ bptUser }) => {
 
   const styles = {
     card: {
-      width: 400,
+      width: 500,
     },
     cardBody: {
       paddingBottom: 'unset'
     }
   };
 
+  const PNL = ({ item }:any) => {
+    const profit = Number(item.profitPercent).toFixed(2);
+    const profitLabel = profit.includes('-') ? `${profit}%` : `+${profit}%`
+    return (
+      <Tag color={profit.includes('-') ? 'red' : 'green'} style={{ marginLeft:5 }}>
+        {profitLabel}
+      </Tag>
+    )
+  }
+
   return isValidKey ? (
     <Row gutter={[8, 16]}>
-      <Col>
+      <Col span={12}>
         <Card hoverable style={styles.card} bodyStyle={styles.cardBody}>
           <List
             dataSource={balances.listData}
-            header={<div>Total Value : {thbCurrency(balances.totalValue)}</div>}
+            header={<div>Market Value : {thbCurrency(balances.netWorth)}</div>}
             renderItem={(item:any) => (
               <List.Item key={`${item.symbol}_${item.available}`}>
                 <List.Item.Meta
-                  avatar={
-                    <Avatar src={getCoinSymbolIcon(item.symbol)} />
+                  avatar={<Avatar src={getCoinSymbolIcon(item.symbol)} />}
+                  title={
+                    <a href={getCoinInfo(item.symbol,true)} target="_blank">
+                      {item.symbol}
+                      <PNL item={item}/>
+                    </a>
                   }
-                  title={<a href={getCoinInfo(item.symbol,true)} target="_blank">{item.symbol}</a>}
-                  description={item.available}
+                  description={<Progress percent={item.holdingPercent} showInfo={false} />}
                 />
                 <div style={{ textAlign: 'right' }}>
-                  <span>{item.percent}%</span><br/>
-                  <span style={{ color:'green' }}>{thbCurrency(item.realValue)}</span>
+                  <Tooltip placement="left" title={'Holdings'}>
+                    <Tag color='blue'>{item.available}</Tag>
+                  </Tooltip>
+                  <br/>
+                  <Tag color='green' style={{ marginTop:5 }}>{thbCurrency(item.marketValue)}</Tag>
                 </div>
               </List.Item>
             )}>
           </List>
         </Card>
       </Col>
-      <Col>
-        <PieChart
-          highcharts={Highcharts}
-          options={{
-            chart: {
-              type: "pie"
-            },
-            title: {
-              text: 'Total Holdings'
-            },
-            credits: {
-              enabled: false
-            },
-            series: [{
-              data: balances.pieData
-            }],
-          }}
-        />
+      <Col span={12}>
+        <Card title="Profit / Loss" style={styles.card}>
+          <div style={{ width:'100%' }}>
+            <PieChart
+              highcharts={Highcharts}
+              options={{
+                chart: {
+                  type: "pie"
+                },
+                title: {
+                  text: ''
+                },
+                credits: {
+                  enabled: false
+                },
+                tooltip: {
+                  formatter: function(){
+                    let curElem:any = this;
+                    if(curElem?.key){
+                      const targetDep:any = balances.listData.find((e:any) => e.symbol == curElem?.key)
+                      if(targetDep){
+                        const { symbol, totalBought, marketPrice, marketValue, profitPercent, holdingPercent } = targetDep;
+                        return `
+                          <b>&nbsp;${symbol}</b><br/>
+                          Market Price: ฿${Number(marketPrice).toFixed(2)}<br/>
+                          Current Value : ฿${Number(marketValue).toFixed(2)}<br/>
+                          Profit Value: ฿${Number(Number(marketValue) - Number(totalBought)).toFixed(2)}<br/>
+                          Profit Percent: ${Number(profitPercent).toFixed(2)}%<br/>
+                          Holdings: ${Number(holdingPercent).toFixed(2)}%<br/>
+                        `;
+                      }
+                    }
+                    return `Profit: ${formatCash(curElem.y)}`;
+                  }
+                },
+                series: [{
+                  data: balances.listData.map((eachItem:any) => {
+                    return {
+                      name: eachItem.symbol,
+                      y: Number(Number(eachItem.marketValue) - Number(eachItem.totalBought))
+                    }
+                  }).filter((e:any) => e.y > 0)
+                }],
+              }}
+            />
+          </div>
+        </Card>
       </Col>
     </Row>
   ) : <Loader/>
