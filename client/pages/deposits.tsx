@@ -113,7 +113,7 @@ const Deposits: NextPage<IInitialProps> = () => {
             yAxis: {
               min: 0,
               title: {
-                text: 'Amount'
+                text: ''
               }
             },
             legend: {
@@ -147,7 +147,7 @@ const Deposits: NextPage<IInitialProps> = () => {
     <div>
       <Row gutter={[8, 16]}>
         <Col span={16}>
-          <FiatCard hoverable title="Fiat Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}
+          <FiatCard hoverable title="Fiat" bordered={true} style={styles.card} bodyStyle={styles.cardBody}
             extra={
               <strong style={{ color:'green'}}>
                 <Tooltip placement="topLeft" title={overViewData?.netWorth ? `Real Value : ${thbCurrency(overViewData?.netWorth)}` : ''}>
@@ -159,7 +159,7 @@ const Deposits: NextPage<IInitialProps> = () => {
           </FiatCard>
         </Col>
         <Col span={8}>
-          <Card hoverable title="Crypto Deposits" bordered={true} style={styles.card} bodyStyle={styles.cardBody}>
+          <Card hoverable title="Crypto" bordered={true} style={styles.card} bodyStyle={styles.cardBody}>
             <List
               dataSource={deposits.crypto}
               renderItem={(item:any) => (

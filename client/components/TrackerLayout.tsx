@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Router from 'next/router'
 import { Layout, Menu, notification } from 'antd';
-import { CloudDownloadOutlined, WalletOutlined, CloudUploadOutlined, ApiOutlined, FileProtectOutlined, LogoutOutlined } from '@ant-design/icons';
+import { CloudDownloadOutlined, CloudUploadOutlined, PieChartOutlined, FileProtectOutlined, LogoutOutlined } from '@ant-design/icons';
 import { SIGNOUT } from '../documents'
 import { useMutation } from '@apollo/client'
 import { useRecoilState } from 'recoil';
@@ -33,8 +33,8 @@ const TrackerLayout = (props:any) => {
       <Sider theme="light">
         <div style={{ height: '32px', background: '#616161', margin: '16px' }} />
         <Menu theme="light" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item key="assets" icon={<WalletOutlined />}>
-            <Link href="/">Assets</Link>
+          <Menu.Item key="overview" icon={<PieChartOutlined />}>
+            <Link href="/">Overview</Link>
           </Menu.Item>
           <Menu.Item key="orders" icon={<FileProtectOutlined />}>
             <Link href="/orders">Orders</Link>
@@ -51,7 +51,7 @@ const TrackerLayout = (props:any) => {
         </Menu>
       </Sider>
       <Layout className="content-light">
-        <Header className="header-light" />
+        {/* <Header className="header-light" /> */}
         <Content>
           <div className="site-layout-background" style={{ padding: 24, height:'100%' }}>
             { props.children }

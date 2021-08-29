@@ -1,5 +1,5 @@
 import { NextPage } from "next"
-import { Row, Card, List, Avatar, Col, Tooltip, Tag, Progress, notification } from 'antd';
+import { Row, Card, List, Avatar, Col, Tooltip, Tag, Tabs, Progress, notification } from 'antd';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { credentials, overview } from '../recoils/atoms'
@@ -11,9 +11,11 @@ import { Loader } from '../components/Loader'
 import Cookies from "next-cookies"
 import Router from "next/router"
 import Highcharts from "highcharts/highstock";
-import PieChart from "highcharts-react-official";
+import HighchartsReact from "highcharts-react-official";
 
 const Home: NextPage<IInitialProps> = ({ bptUser }) => {
+
+  const { TabPane } = Tabs;
 
   const [isValidKey, setValidKey] = useRecoilState(credentials);
   const [overViewData, setOverViewData] = useRecoilState(overview);
@@ -41,11 +43,8 @@ const Home: NextPage<IInitialProps> = ({ bptUser }) => {
   }, [data,error])
 
   const styles = {
-    card: {
-      width: 500,
-    },
     cardBody: {
-      paddingBottom: 'unset'
+      paddingTop: '10px',
     }
   };
 
@@ -60,85 +59,131 @@ const Home: NextPage<IInitialProps> = ({ bptUser }) => {
   }
 
   return isValidKey ? (
-    <Row gutter={[8, 16]}>
-      <Col span={12}>
-        <Card hoverable style={styles.card} bodyStyle={styles.cardBody}>
-          <List
-            dataSource={balances.listData}
-            header={<div>Market Value : {thbCurrency(balances.netWorth)}</div>}
-            renderItem={(item:any) => (
-              <List.Item key={`${item.symbol}_${item.available}`}>
-                <List.Item.Meta
-                  avatar={<Avatar src={getCoinSymbolIcon(item.symbol)} />}
-                  title={
-                    <a href={getCoinInfo(item.symbol,true)} target="_blank">
-                      {item.symbol}
-                      <PNL item={item}/>
-                    </a>
-                  }
-                  description={<Progress percent={item.holdingPercent} showInfo={false} />}
-                />
-                <div style={{ textAlign: 'right' }}>
-                  <Tooltip placement="left" title={'Holdings'}>
-                    <Tag color='blue'>{item.available}</Tag>
-                  </Tooltip>
-                  <br/>
-                  <Tag color='green' style={{ marginTop:5 }}>{thbCurrency(item.marketValue)}</Tag>
-                </div>
-              </List.Item>
-            )}>
-          </List>
-        </Card>
-      </Col>
-      <Col span={12}>
-        <Card title="Profit / Loss" style={styles.card}>
-          <div style={{ width:'100%' }}>
-            <PieChart
-              highcharts={Highcharts}
-              options={{
-                chart: {
-                  type: "pie"
-                },
-                title: {
-                  text: ''
-                },
-                credits: {
-                  enabled: false
-                },
-                tooltip: {
-                  formatter: function(){
-                    let curElem:any = this;
-                    if(curElem?.key){
-                      const targetDep:any = balances.listData.find((e:any) => e.symbol == curElem?.key)
-                      if(targetDep){
-                        const { symbol, totalBought, marketPrice, marketValue, profitPercent, holdingPercent } = targetDep;
-                        return `
-                          <b>&nbsp;${symbol}</b><br/>
-                          Market Price: ฿${Number(marketPrice).toFixed(2)}<br/>
-                          Current Value : ฿${Number(marketValue).toFixed(2)}<br/>
-                          Profit Value: ฿${Number(Number(marketValue) - Number(totalBought)).toFixed(2)}<br/>
-                          Profit Percent: ${Number(profitPercent).toFixed(2)}%<br/>
-                          Holdings: ${Number(holdingPercent).toFixed(2)}%<br/>
-                        `;
+      <Row gutter={[8,8]}>
+        <Col span={8}>
+          <Card bodyStyle={styles.cardBody} >
+            <Tabs defaultActiveKey="portfolio">
+              <TabPane tab="Portfolio" key="portfolio">
+                <List
+                  dataSource={balances.listData}
+                  renderItem={(item:any) => (
+                    <List.Item key={`${item.symbol}_${item.available}`} style={{ paddingLeft:'8px' }}>
+                      <List.Item.Meta
+                        avatar={<Avatar src={getCoinSymbolIcon(item.symbol)} />}
+                        title={
+                          <a href={getCoinInfo(item.symbol,true)} target="_blank">
+                            {item.symbol}
+                          </a>
+                        }
+                        description={item.available}
+                      />
+                      <Tag color='green'>{thbCurrency(item.marketValue)}</Tag>
+                      </List.Item>
+                  )}>
+                </List> 
+              </TabPane>
+              <TabPane tab="Top Performance" key="performance">
+                <List
+                    dataSource={balances.listData.slice().sort((a:any, b:any) => Number(b.profitPercent) - Number(a.profitPercent))}
+                    renderItem={(item:any) => (
+                      <List.Item key={`${item.symbol}_${item.available}`} style={{ paddingLeft:'8px' }}>
+                        <List.Item.Meta
+                          avatar={<Avatar src={getCoinSymbolIcon(item.symbol)} />}
+                          title={
+                            <a href={getCoinInfo(item.symbol,true)} target="_blank">
+                              {item.symbol}
+                            </a>
+                          }
+                          description={item.available}
+                        />
+                        <PNL item={item}/>
+                        </List.Item>
+                    )}>
+                  </List> 
+              </TabPane>
+            </Tabs>
+          </Card>
+        </Col>
+        <Col span={16}>
+          <Card title="Profit / Loss">
+            <div style={{ width:'100%' }}>
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={{
+                  chart: {
+                    type: "column",
+                  },
+                  plotOptions: {
+                    column: {
+                      borderWidth: 0,
+                      borderRadius: 5,
+                      colorByPoint: true
+                    },
+                    series: {
+                      // pointWidth: 50,
+                      stacking: 'normal'
+                    }
+                  },
+                  title: {
+                    text: '',
+                  },
+                  credits: {
+                    enabled: false
+                  },
+                  xAxis: {
+                    type: 'category',
+                    labels: {
+                      rotation: -45,
+                      style: {
+                        fontSize: '10px',
+                        fontWeight: 'bold',
+                        fontFamily: 'Verdana, sans-serif'
                       }
                     }
-                    return `Profit: ${formatCash(curElem.y)}`;
-                  }
-                },
-                series: [{
-                  data: balances.listData.map((eachItem:any) => {
-                    return {
-                      name: eachItem.symbol,
-                      y: Number(Number(eachItem.marketValue) - Number(eachItem.totalBought))
+                  },
+                  yAxis: {
+                    title: {
+                      text: '',
                     }
-                  }).filter((e:any) => e.y > 0)
-                }],
-              }}
-            />
-          </div>
-        </Card>
-      </Col>
-    </Row>
+                  },
+                  legend: {
+                    enabled: false
+                  },
+                  tooltip: {
+                    formatter: function(){
+                      let curElem:any = this;
+                      if(curElem?.key){
+                        const targetDep:any = balances.listData.find((e:any) => e.symbol == curElem?.key)
+                        if(targetDep){
+                          const { symbol, totalBought, marketPrice, marketValue, profitPercent, holdingPercent } = targetDep;
+                          const isPositive = Number(profitPercent) > 0;
+                          return `
+                            <b>&nbsp;${symbol}</b><br/>
+                            Market Price: ${thbCurrency(marketPrice)}<br/>
+                            Total Invested: ${thbCurrency(totalBought)}<br/>
+                            Current Value: ${thbCurrency(marketValue)}<br/>
+                            ${isPositive ? 'Profit' : 'Loss'}: ${Number(profitPercent).toFixed(2)}% | ${thbCurrency(Number(marketValue) - Number(totalBought))}<br/>
+                            Holdings: ${Number(holdingPercent).toFixed(2)}%<br/>
+                          `;
+                        }
+                      }
+                      return `Profit: ${formatCash(curElem.y)}`;
+                    }
+                  },
+                  series: [{
+                    data: balances.listData.map((eachItem:any) => {
+                      return {
+                        name: eachItem.symbol,
+                        y: Number(Number(eachItem.marketValue) - Number(eachItem.totalBought)),
+                      }
+                    })
+                  }],
+                }}
+              />
+            </div>
+          </Card>
+        </Col>
+      </Row>
   ) : <Loader/>
 }
 
