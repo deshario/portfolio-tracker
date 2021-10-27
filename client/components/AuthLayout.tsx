@@ -56,7 +56,7 @@ const LeftContainer = styled.div`
 `
 
 const ChildContainer = styled(Col)`
-  height:490px;
+  min-height:490px;
   background:white;
   border-top-right-radius:6px;
   border-bottom-right-radius:6px;

@@ -19,14 +19,13 @@ const balanceController = {
       const [balancesRes, tickersRes] = await Promise.all([mBalances, mTickers]);
       const tickersDict = tickersRes.reduce((acc, item) => ({ ...acc, [item.symbol.toLowerCase()] : item }),{});
       const balances = balancesRes?.data?.result || [];
-      
       const balanceDetail = await Object.entries(balances).reduce(async (acc:any, coin:any) => {
         const balances = await acc;
         const key = coin[0];
         const value = coin[1];
         if(value?.available > 0){
           const dictKey = `thb_${key.toLowerCase()}`
-          const marketPrice = tickersDict[dictKey]?.last || -1;
+          const marketPrice = tickersDict[dictKey]?.last || value?.available;
           const order = await orderController.getOrderHistory({ sym: dictKey }, context);
           const currentValue = Number(value.available) * Number(marketPrice);
           const profit = (currentValue - order?.totalBought) / order?.totalBought * 100;
@@ -38,7 +37,7 @@ const balanceController = {
             marketPrice,
             marketValue,
             totalBought: order?.totalBought,
-            profitPercent: profit == Number.POSITIVE_INFINITY ? 0 : profit
+            profitPercent: (profit == Number.POSITIVE_INFINITY || profit == Number.NEGATIVE_INFINITY) ? 0 : profit
           });
         }
         return balances
@@ -50,6 +49,7 @@ const balanceController = {
         const percent = (eachItem.marketValue / Number(netWorth)) * 100;
         return { ...eachItem, holdingPercent:Number(percent).toFixed(2) }
       });
+
       return { success: true, netWorth: Number(netWorth).toFixed(2), balances: finalBalances }
     }catch(err){
       throw err
