@@ -9,7 +9,7 @@ const balanceType = gql`
 		marketPrice: String
 		marketValue: String
 		totalBought: String
-    profitPercent: String
+		profitPercent: String
 		holdingPercent: String
 	}
 

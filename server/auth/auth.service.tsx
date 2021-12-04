@@ -51,9 +51,9 @@ export const refreshToken = (data: IUser): string => {
 
 export const verifyCredentials = async ({ key, secret }) => {
   try{
-    const payload = {}
+    const payload = { lmt:1 }
     const { data, headers } = await getPureReqConstructor({ key, secret, payload });
-    const fiatDeposits = await axios.post(`${API_HOST}/api/fiat/deposit-history?lmt=1`, data, headers)
+    const fiatDeposits = await axios.post(`${API_HOST}/api/fiat/deposit-history`, data, headers)
     const isValidConnection = fiatDeposits?.data?.error == 0
     return { valid: isValidConnection };
   }catch(err){

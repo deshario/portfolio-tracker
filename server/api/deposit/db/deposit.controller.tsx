@@ -41,7 +41,7 @@ const depositController = {
         rebuildAuthCookie(context,false);
         throw new Error("Invalid key detected");
       }
-      const payload = {}
+      const payload = { lmt:99999 }
       const { data, headers } = await getReqConstructor({ context, payload });
       const fiatDeposits = axios.post(`${API_HOST}/api/fiat/deposit-history`, data, headers)
       const cryptoDeposits = axios.post(`${API_HOST}/api/crypto/deposit-history`, data, headers)

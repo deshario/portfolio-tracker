@@ -11,7 +11,7 @@ const orderController = {
         throw new Error("Invalid key detected");
       }
       const { sym } = args
-      const payload = { sym }
+      const payload = { sym, lmt:99999 }
       const { data, headers } = await getReqConstructor({ context, payload });
       const { data: { result : symbolData } } = await axios.post(`${API_HOST}/api/market/my-order-history`, data, headers)
       const totalBought = symbolData && symbolData.reduce((total,item) => total+(Number(item.amount)*Number(item.rate)),0) || 0;
