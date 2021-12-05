@@ -13,7 +13,7 @@
     "@apollo/client": "^3.3.13",
     "antd": "4.15.6",
     "apollo-server-express": "^2.21.1",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "cookie-parser": "^1.4.5",
     "crypto-js": "^4.1.1",
     "dotenv": "^10.0.0",
