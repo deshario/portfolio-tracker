@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client"
+import { gql } from '@apollo/client'
 
 export const FUSER = gql`
   fragment User on User {
@@ -51,8 +51,8 @@ export const SIGNOUT = gql`
 `
 
 export const SetCredentials = gql`
-  mutation setCredentials($key:String!, $secret:String! $token:String!){
-    setCredentials(key:$key, secret:$secret token:$token){
+  mutation setCredentials($key: String!, $secret: String!, $token: String!) {
+    setCredentials(key: $key, secret: $secret, token: $token) {
       success
       info
       email

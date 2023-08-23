@@ -4,7 +4,7 @@ export const BALANCE_FRAG = gql`
   fragment TotalBalance on TotalBalance {
     success
     netWorth
-    balances{
+    balances {
       symbol
       available
       reserved

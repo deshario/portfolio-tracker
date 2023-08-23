@@ -1,1 +1,1 @@
-export * from "./local/passport"
+export * from './local/passport'

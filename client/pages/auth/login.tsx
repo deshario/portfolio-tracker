@@ -1,51 +1,68 @@
 import Link from 'next/link'
 import Router from 'next/router'
-import { Card, Form, Input, Button, Typography, Divider, notification } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import {
+  Card,
+  Form,
+  Input,
+  Button,
+  Typography,
+  Divider,
+  notification,
+} from 'antd'
+import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { useMutation } from '@apollo/client'
 import { SIGNIN } from '../../documents'
-import { useRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil'
 import { credentials } from '../../recoils/atoms'
 import { IInitialProps } from '../../../interface'
-import Cookies from "next-cookies"
+import Cookies from 'next-cookies'
 import styled from 'styled-components'
 
 const Login = () => {
-
-  const [isValidCreds, setValidCreds] = useRecoilState(credentials);
+  const [isValidCreds, setValidCreds] = useRecoilState(credentials)
 
   const styles = {
-    card:{
+    card: {
       border: 'unset',
     },
-    cardBody:{
-      paddingTop:'unset'
-    }
-  };
+    cardBody: {
+      paddingTop: 'unset',
+    },
+  }
 
   const [signin] = useMutation(SIGNIN, {
-    onCompleted: ({ signin: { name, validKey }}) => {
+    onCompleted: ({ signin: { name, validKey } }) => {
       notification.success({ message: `Welcome ${name}` })
-      setValidCreds(validKey);
-      if(validKey) Router.push({ pathname: '/' })
-      if(!validKey){
-        setTimeout(() => notification.info({ message: 'Invalid Key', description: 'Please setup your key', duration : 0}), 500)
+      setValidCreds(validKey)
+      if (validKey) Router.push({ pathname: '/' })
+      if (!validKey) {
+        setTimeout(
+          () =>
+            notification.info({
+              message: 'Invalid Key',
+              description: 'Please setup your key',
+              duration: 0,
+            }),
+          500,
+        )
         Router.push({ pathname: '/auth/credentials' })
       }
     },
     onError: (err) => {
-      const errTitle = err?.message.includes('Invalid') ? "Invalid Credentials" : "Something went wrong";
+      const errTitle = err?.message.includes('Invalid')
+        ? 'Invalid Credentials'
+        : 'Something went wrong'
       notification.error({ message: errTitle, description: 'Please try again' })
-    }
+    },
   })
 
-  const onSubmit = (values:any) => {
-    const { email, password } = values;
+  const onSubmit = (values: any) => {
+    const { email, password } = values
     signin({
-      variables:{
+      variables: {
         email,
-        password
-      }
+        password,
+      },
     })
   }
 
@@ -55,21 +72,41 @@ const Login = () => {
         <Divider>
           <Typography.Title level={2}>Login</Typography.Title>
         </Divider>
-        <Form layout="vertical" className="loginForm" requiredMark={'optional'} onFinish={onSubmit}>
-          <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Please input your email!' }]}>
-            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Email" />
+        <Form
+          layout='vertical'
+          className='loginForm'
+          requiredMark={'optional'}
+          onFinish={onSubmit}
+        >
+          <Form.Item
+            label='Email'
+            name='email'
+            rules={[{ required: true, message: 'Please input your email!' }]}
+          >
+            <Input
+              prefix={<UserOutlined className='site-form-item-icon' />}
+              placeholder='Email'
+            />
           </Form.Item>
-          <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please input your Password!' }]}>
-            <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Password"/>
+          <Form.Item
+            label='Password'
+            name='password'
+            rules={[{ required: true, message: 'Please input your Password!' }]}
+          >
+            <Input.Password
+              prefix={<LockOutlined className='site-form-item-icon' />}
+              placeholder='Password'
+            />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="loginBtn">
+            <Button type='primary' htmlType='submit' className='loginBtn'>
               Log in
             </Button>
           </Form.Item>
         </Form>
       </Card>
-      <p className="signUpLabel">Not a member?
+      <p className='signUpLabel'>
+        Not a member?
         <span>
           <Link href='/auth/register'>
             <strong> Sign up now</strong>
@@ -83,13 +120,13 @@ const Login = () => {
 export default Login
 
 const Container = styled.div`
-  padding:20px 20px 0 20px;
+  padding: 20px 20px 0 20px;
 `
 
 Login.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
   const { res } = ctx
   const { bptUser, bptToken }: any = Cookies(ctx)
-  const redirect = (path:string) => {
+  const redirect = (path: string) => {
     if (res) {
       res.writeHead(302, { Location: path })
       res.end()
@@ -97,7 +134,7 @@ Login.getInitialProps = async (ctx: any): Promise<IInitialProps> => {
       Router.push({ pathname: path })
     }
   }
-  if(bptUser?._id && !bptUser?.validKey) redirect("/auth/credentials")
-  if(bptUser?._id && bptUser?.validKey) redirect("/")
+  if (bptUser?._id && !bptUser?.validKey) redirect('/auth/credentials')
+  if (bptUser?._id && bptUser?.validKey) redirect('/')
   return { bptUser, bptToken }
 }

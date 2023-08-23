@@ -1,3 +1,3 @@
-export { userType } from "./type"
-export { userQuery } from "./query"
-export { userMutation } from "./mutation"
+export { userType } from './type'
+export { userQuery } from './query'
+export { userMutation } from './mutation'

@@ -1,8 +1,13 @@
-import { useMemo } from "react";
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
+import { useMemo } from 'react'
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  InMemoryCache,
+} from '@apollo/client'
 import Cookies from 'next-cookies'
 
-let apolloClient:any;
+let apolloClient: any
 
 const setHeader = (operation: any, token: string) => {
   operation.setContext(({ headers = {} }: any): any => {
@@ -17,10 +22,9 @@ const setHeader = (operation: any, token: string) => {
 }
 
 const createApolloClient = () => {
-
   const httpLink = new HttpLink({
-    uri: "/playground",
-    credentials: 'same-origin'
+    uri: '/playground',
+    credentials: 'same-origin',
   })
 
   const authLink = new ApolloLink((operation, forward): any => {
@@ -30,26 +34,25 @@ const createApolloClient = () => {
   })
 
   return new ApolloClient({
-    ssrMode: typeof window === "undefined",
-    link : ApolloLink.from([authLink, httpLink]),
+    ssrMode: typeof window === 'undefined',
+    link: ApolloLink.from([authLink, httpLink]),
     cache: new InMemoryCache(),
-    connectToDevTools: process.env.NODE_ENV === 'development'
-  });
-
+    connectToDevTools: process.env.NODE_ENV === 'development',
+  })
 }
 
 export function initializeApollo(initialState = {}) {
-  const _apolloClient = apolloClient ?? createApolloClient();
+  const _apolloClient = apolloClient ?? createApolloClient()
   if (initialState) {
-    const existingCache = _apolloClient.extract();
-    _apolloClient.cache.restore({ ...existingCache, ...initialState });
+    const existingCache = _apolloClient.extract()
+    _apolloClient.cache.restore({ ...existingCache, ...initialState })
   }
-  if (typeof window === "undefined") return _apolloClient;
-  if (!apolloClient) apolloClient = _apolloClient;
-  return _apolloClient;
+  if (typeof window === 'undefined') return _apolloClient
+  if (!apolloClient) apolloClient = _apolloClient
+  return _apolloClient
 }
 
-export function useApollo(initialState:any) {
-  const store = useMemo(() => initializeApollo(initialState), [initialState]);
-  return store;
+export function useApollo(initialState: any) {
+  const store = useMemo(() => initializeApollo(initialState), [initialState])
+  return store
 }

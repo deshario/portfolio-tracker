@@ -1,25 +1,25 @@
 import { API_HOST } from '../../../config/handler'
 import { Ticker } from '../../../../interface'
-import axios from 'axios';
+import axios from 'axios'
 
 const tickerController = {
-  getTickers: async() => {
-    try{
+  getTickers: async () => {
+    try {
       const { data: result } = await axios.get(`${API_HOST}/api/market/ticker`)
-      const tickers:Ticker[] = Object.keys(result).map(key => {
+      const tickers: Ticker[] = Object.keys(result).map((key) => {
         return {
-          symbol:key,
+          symbol: key,
           last: result[key]['last'],
           lowestAsk: result[key]['lowestAsk'],
           highestBid: result[key]['highestBid'],
-          percentChange: result[key]['percentChange']
+          percentChange: result[key]['percentChange'],
         }
-      });
-      return tickers;
-    }catch(err){
+      })
+      return tickers
+    } catch (err) {
       return []
     }
-  }
+  },
 }
 
 export { tickerController }

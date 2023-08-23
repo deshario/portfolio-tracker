@@ -1,6 +1,6 @@
-import { atom } from "recoil"
+import { atom } from 'recoil'
 
 export const avCoins = atom({
-  key: "availableCoins",
-  default: []
+  key: 'availableCoins',
+  default: [],
 })

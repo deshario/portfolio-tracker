@@ -3,7 +3,7 @@ import { gql } from '@apollo/client'
 export const FIAT_DEPOSIT = gql`
   fragment FiatDeposit on FiatDeposit {
     success
-    data{
+    data {
       txn_id
       currency
       amount
@@ -16,7 +16,7 @@ export const FIAT_DEPOSIT = gql`
 export const ALL_DEPOSIT = gql`
   fragment AllDeposit on AllDeposit {
     success
-    crypto{
+    crypto {
       currency
       hash
       amount
@@ -25,7 +25,7 @@ export const ALL_DEPOSIT = gql`
       status
       time
     }
-    fiat{
+    fiat {
       txn_id
       currency
       amount
@@ -37,7 +37,7 @@ export const ALL_DEPOSIT = gql`
 
 export const QUERY_FIAT_DEPOSIT = gql`
   query getFiatDeposit {
-    getFiatDeposit{
+    getFiatDeposit {
       ...FiatDeposit
     }
   }
@@ -45,8 +45,8 @@ export const QUERY_FIAT_DEPOSIT = gql`
 `
 
 export const QUERY_ALL_DEPOSIT = gql`
-  query getAllDeposit{
-    getAllDeposit{
+  query getAllDeposit {
+    getAllDeposit {
       ...AllDeposit
     }
   }

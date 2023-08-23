@@ -4,101 +4,104 @@
   --headerBg: #ededed;
 }
 
-.ant-layout-sider-light{
-  background:var(--lightGray);
+.ant-layout-sider-light {
+  background: var(--lightGray);
   overflow: auto;
   height: 100vh;
   position: fixed;
   left: 0;
 }
 
-.ant-menu{
-  background:var(--lightGray);
+.ant-menu {
+  background: var(--lightGray);
 }
 
-.ant-menu > .ant-menu-item{
-  color:black;
+.ant-menu > .ant-menu-item {
+  color: black;
 }
 
-.ant-menu > .ant-menu-item:hover{
-  color: #3F51B5;
+.ant-menu > .ant-menu-item:hover {
+  color: #3f51b5;
 }
 
-.ant-layout-sider-trigger{
-  background:var(--lightGray) !important;
+.ant-layout-sider-trigger {
+  background: var(--lightGray) !important;
 }
 
 /* .ant-layout-header, */
-header.header-light{
+header.header-light {
   background: var(--headerBg) !important;
 }
 
 /* section.ant-layout */
-section.content-light{
-  background: rgb(252,252,252);
+section.content-light {
+  background: rgb(252, 252, 252);
   margin-left: 200px !important;
 }
 
-.ant-list-item{
-  transition: transform .2s;
+.ant-list-item {
+  transition: transform 0.2s;
 }
 
 .ant-list-item:hover {
   transform: scale(1.05);
 }
 
-.ant-list-header{
-  padding-top:unset;
+.ant-list-header {
+  padding-top: unset;
 }
 
 .ant-list-header div {
   text-align: center;
-  font-weight:bold;
-  font-size:18px;
+  font-weight: bold;
+  font-size: 18px;
 }
 
-.ant-timeline-item-content{
-  transition: transform .2s;
+.ant-timeline-item-content {
+  transition: transform 0.2s;
 }
 
-.ant-timeline-item-content:hover{
+.ant-timeline-item-content:hover {
   transform: scale(1.05);
 }
 
-.ant-timeline-item-last{
+.ant-timeline-item-last {
   padding-bottom: unset;
 }
 
 /* Login Form */
-.loginBtn, .registerBtn, .updateBtn,
-.loginBtn:focus, .registerBtn:focus, .updateBtn:focus{
+.loginBtn,
+.registerBtn,
+.updateBtn,
+.loginBtn:focus,
+.registerBtn:focus,
+.updateBtn:focus {
   width: 100% !important;
   background: #764ba2;
-  padding:10px;
-  font-size:18px;
-  margin-top:15px;
-  height:max-content;
-  transition: transform .5s ease;
+  padding: 10px;
+  font-size: 18px;
+  margin-top: 15px;
+  height: max-content;
+  transition: transform 0.5s ease;
 }
 
-.loginBtn:hover, .registerBtn:hover, .updateBtn:hover{
+.loginBtn:hover,
+.registerBtn:hover,
+.updateBtn:hover {
   background: #764ba2;
   transform: scale(1.05);
 }
 
-.signUpLabel{
+.signUpLabel {
   text-align: center;
   font-size: 1.1em;
   margin-block-end: unset;
   cursor: pointer;
 }
 
-
 /* .ant-layout-content{
   background:green !important;
 } */
-
-
 
 /* .ant-menu > .ant-menu-item:hover,
 .ant-menu > .ant-menu-submenu:hover,

@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express"
+import { gql } from 'apollo-server-express'
 
 const userType = gql`
   scalar ObjectID
@@ -32,7 +32,6 @@ const userType = gql`
   type validCredentials {
     valid: Boolean
   }
-
 `
 
 export { userType }

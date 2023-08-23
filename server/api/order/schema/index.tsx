@@ -1,2 +1,2 @@
-export { orderQuery } from "./order.query"
-export { orderType } from "./order.type"
+export { orderQuery } from './order.query'
+export { orderType } from './order.type'
